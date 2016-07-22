@@ -1,5 +1,6 @@
 function log_p = logmvnpdf(x, mu, covmat)
 % log(mvnpdf(x, mu, covmat)).
+%
 % x(i,j): i-th sample on j-th dimension.
 % mu: row vector.
 % covmat: square matrix.
