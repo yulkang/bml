@@ -88,7 +88,8 @@ else
 end
 
 % Copy the help section.
-c = strsplit(help(file0), sprintf('\n'));
+[~,name0] = fileparts(file0);
+c = strsplit(help(name0), sprintf('\n'));
 % help() inserts a blank line at the end. Cancel it.
 if isempty(c{end}), c = c(1:(end-1)); end 
 for ii = 1:numel(c)

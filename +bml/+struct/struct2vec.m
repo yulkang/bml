@@ -1,4 +1,3 @@
-function v = struct2vec(S)
-% v = struct2vec(S)
-C = struct2cell(S);
-v = cell2mat(C);
+function varargout = struct2vec(varargin)
+% v = struct2vec(S, [fields])
+[varargout{1:nargout}] = struct2vec(varargin{:});

@@ -1,10 +1,10 @@
-function [conflicts, moved, skipped] = flatten_pkg(varargin)
+function [conflicts, moved, skipped] = pkg2alias(varargin)
 % Move *.m files inside package into a regular folder, leaving aliases.
 % Allows using both tab completion (benefit of package)
 % and short names and balloon help of the input arguments (benefit of
 % functions directly on path).
 %
-% [moved, skipped] = flatten_pkg(varargin)
+% [moved, skipped] = pkg2alias(varargin)
 % moved: cell array of original .m files/class folders that are moved.
 % skipped cell array of original .m files/class folders that are skipped.
 %
