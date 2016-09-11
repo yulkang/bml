@@ -121,6 +121,12 @@ methods
         name = strrep(name, '.', '^'); 
     end
     function [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
+        % [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
+        %
+        % add_fields: fields to add to S_file
+        % remove_fields
+        % : fields to remove from S0_file and S_file.
+        %   Field names can be either S0_file's or S_file's. 
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
@@ -137,7 +143,10 @@ methods
             S_file = struct;
             S0_file = struct;
         else
-            [~, ia] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
+            [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
+            [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
+            ia = intersect(ia1, ia2, 'stable');
+            
             file_fields = file_fields(ia, :);
             if ~isempty(file_mult)
                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');

@@ -11,6 +11,8 @@ dst = pairs(:,2);
 is_changed = false(n, 1);
 
 for ii = 1:n
+    if ~isfield(S, src{ii}), continue; end
+    
     [S.(dst{ii})] = [S.(src{ii})];
     
     is_changed(ii) = ~strcmp(dst{ii}, src{ii});

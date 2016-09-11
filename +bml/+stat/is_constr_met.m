@@ -1,7 +1,7 @@
 function [all_met, met, v] = is_constr_met(x, lb, ub, A, b, Aeq, beq, nonlcon)
 % Tests if all constraints are met.
 %
-% [all_met, met, v] = is_constr_met(x, lb, ub, A, b, Aeq, beq, nonlcon)
+% [all_met, met] = is_constr_met(x, lb, ub, A, b, Aeq, beq, nonlcon)
 %
 % x: parameter vector.
 % lb, ub: vectors of the same length as x. Leave empty to skip.

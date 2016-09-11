@@ -1,4 +1,7 @@
 function [m, s] = gamfit_ms(freq)
+% [m, s] = gamfit_ms(freq)
+
+% 2015 (c) Yul Kang. hk2699 at columbia dot edu.
 
 n = length(freq);
 x = 1:n;

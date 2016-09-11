@@ -1,5 +1,5 @@
-function [h, merged] = copyaxes(src, dst)
-% [h, dst] = copyaxes(src, dst)
+function [merged, h] = copyaxes(src, dst)
+% [merged, h] = copyaxes(src, dst)
 %
 % src, dst : handles of the axes.
 %
@@ -21,7 +21,7 @@ ylim_src = ylim(src);
 
 h.src.axes = copyobj(h.src.axes, get(h.dst.axes, 'Parent'));
 set(h.src.axes, 'Position', get(h.dst.axes, 'Position'));
-h.src = copyFields(h.src, bml.plot.children2struct(h.src.axes));
+h.src = copyFields(h.src, bml.plot.figure2struct(h.src.axes));
 
 if ~is_dst_empty
     xlim(h.src.axes, ...
@@ -31,7 +31,7 @@ if ~is_dst_empty
 end
 
 h.dst.children = copyobj(get(h.dst.axes, 'Children'), h.src.axes);
-h.dst = copyFields(h.dst, bml.plot.children2struct(h.dst.children));
+h.dst = copyFields(h.dst, bml.plot.figure2struct(h.dst.children));
 
 delete(dst);
 merged = h.src.axes; % In this implementation, the old axes is replaced.
@@ -40,7 +40,7 @@ h.dst.axes = merged;
 % % Another implementation that preserves dst but does not work
 
 % h.src.children = copyobj(get(h.src.axes, 'Children'), h.dst.axes);
-% h.src = copyFields(h.src, bml.plot.children2struct(h.src.children));
+% h.src = copyFields(h.src, bml.plot.figure2struct(h.src.children));
 % 
 % h.src.axes = src;
 % h.dst.axes = dst;
@@ -62,7 +62,7 @@ h.dst.axes = merged;
 % end
 
 % for ax = {'src', 'dst'}
-%     h.(ax{1}) = copyFields(h.(ax{1}), bml.plot.children2struct(h.(ax{1}).axes));
+%     h.(ax{1}) = copyFields(h.(ax{1}), bml.plot.figure2struct(h.(ax{1}).axes));
 % end
 % 
 % delete(h.dst.axes);

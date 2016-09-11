@@ -1,8 +1,9 @@
-function help(obj, attr)
+function varargout = help(obj, attr)
 % help(obj, [meth])
 % help('class', [meth])
 % help(file)
-%
+% [...] = help(...)
+
 % 2015-2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
 if exist('attr', 'var') && ~isempty(attr)
@@ -26,12 +27,12 @@ if exist('attr', 'var') && ~isempty(attr)
     return;
     
 elseif isobject(obj)
-    help(class(obj));
+    [varargout{1:nargout}] = help(class(obj));
     return;
     
 elseif ischar(obj)
     try
-        help(obj);
+        [varargout{1:nargout}] = help(obj);
         return;
     catch
         obj = evalin('caller', ['@' obj]);
@@ -46,7 +47,7 @@ if isa(obj, 'function_handle')
     obj0 = obj(1:(ix - 1));
     attr = obj((ix + 1):end);
     cl = evalin('caller', ['class(' obj0 ')']);
-    help([cl '.' attr]);
+    [varargout{1:nargout}] = help([cl '.' attr]);
     
 else
     error('Unknown input class: %s\n', class(obj));

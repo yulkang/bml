@@ -21,9 +21,9 @@ switch desc
         color = color0(1, :);
     case {'t', 'tangerine'}
         color = color0(2, :);
-    case {'o', 'orange'}
+    case {'y', 'yellow', 'o', 'orange'}
         color = color0(3, :);
-    case {'d', 'darkamber'}
+    case {'p', 'purple'}
         color = color0(4, :);
     case {'g', 'green'}
         color = color0(5, :);
