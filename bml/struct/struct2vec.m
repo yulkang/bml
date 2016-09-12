@@ -12,6 +12,6 @@ else
     assert(iscell(fields));
     assert(all(cellfun(@ischar, fields(:))));
 end
-fields0 = fieldnames(fields);
-incl = ismember(fields0, fields);
+fields0 = fieldnames(S);
+[~,incl] = ismember(fields, fields0);
 v = cell2mat(C(incl));
