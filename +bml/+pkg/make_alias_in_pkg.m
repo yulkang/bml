@@ -88,9 +88,11 @@ else
 end
 
 % Copy the help section.
-[~,name0] = fileparts(file0);
+[pth0,name0] = fileparts(file0);
 if ~exist(name0, 'file')
-    error('%s is not on path! help section will not be copied!');
+    addpath(pth0);
+    warning('Added %s to path\n', pth0);
+%     error('%s is not on path! help section will not be copied!');
 end
 c = strsplit(help(name0), sprintf('\n'));
 % help() inserts a blank line at the end. Cancel it.

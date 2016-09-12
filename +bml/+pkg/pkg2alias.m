@@ -26,7 +26,7 @@ function [conflicts, moved, skipped] = pkg2alias(varargin)
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'root', pwd
+    'root', pwd % 'lib/BetterMatlab'
 
     % If true, ask if to use the original name, to rename, or to skip.
     % Even if false, confirms if the name conflicts with names on path.
@@ -168,6 +168,14 @@ n = numel(mfiles);
 for ii = 1:n
     % Parse name
     mfile = mfiles{ii};
+    if isempty(dir(mfile))
+        mfile0 = mfile;
+        mfile = which(mfile);
+        if isempty(mfile)
+            error('%s does not exist!\n', mfile0);
+        end
+    end
+    
     [pth, name] = fileparts(mfile);
     
     % Skip files inside class folders, 
