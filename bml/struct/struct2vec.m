@@ -3,7 +3,7 @@ function v = struct2vec(S, fields)
 C = struct2cell(S);
 
 if nargin < 2
-    v = cell2mat(C);
+    v = cell2vec(C);
     return;
 elseif ~iscell(fields)
     assert(ischar(fields));
