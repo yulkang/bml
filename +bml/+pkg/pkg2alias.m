@@ -1,10 +1,10 @@
-function [conflicts, moved, skipped] = pkg2alias(varargin)
+function [conflicts, moved, skipped] = pkg2alias(src, varargin)
 % Move *.m files inside package into a regular folder, leaving aliases.
 % Allows using both tab completion (benefit of package)
 % and short names and balloon help of the input arguments (benefit of
 % functions directly on path).
 %
-% [moved, skipped] = pkg2alias(varargin)
+% [moved, skipped] = pkg2alias(src, varargin)
 % moved: cell array of original .m files/class folders that are moved.
 % skipped cell array of original .m files/class folders that are skipped.
 %
@@ -26,7 +26,7 @@ function [conflicts, moved, skipped] = pkg2alias(varargin)
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'root', pwd % 'lib/BetterMatlab'
+    'root', 'lib/BetterMatLab' % pwd % 
 
     % If true, ask if to use the original name, to rename, or to skip.
     % Even if false, confirms if the name conflicts with names on path.
@@ -63,8 +63,8 @@ conflicts = {};
 S.root = fullfile(root, nam); % To remove filesep at the end.
 pth_filesep = [S.root, filesep];
 
-% Go to root.
-pd = cd(S.root);
+% % Go to root.
+% pd = cd(S.root);
 
 %% First move all class folders
 if S.move_class
@@ -153,24 +153,27 @@ if S.move_class
 end
 
 %% Then move individual m files that are not inside class folders
-if isequal(S.mfiles, [])
+if isequal(src, [])
     mfiles = rdir(fullfile(S.root, '**/*.m'));
     mfiles = {mfiles.name};
 else
-    if ischar(S.mfiles)
-        S.mfiles = {S.mfiles};
+    if ~iscell(src)
+        src = {src};
     end
-    assert(iscell(S.mfiles));
-    mfiles = S.mfiles;
+    assert(iscell(src));
+    mfiles = src;
 end
 n = numel(mfiles);
 
 for ii = 1:n
     % Parse name
     mfile = mfiles{ii};
+    if isa(mfile, 'function_handle')
+        mfile = func2str(mfile);
+    end
     if isempty(dir(mfile))
         mfile0 = mfile;
-        mfile = which(mfile);
+        mfile = which(mfile0);
         if isempty(mfile)
             error('%s does not exist!\n', mfile0);
         end
@@ -260,4 +263,4 @@ for ii = 1:n
 end
 
 %% Return to previous folder
-cd(pd);
+% cd(pd);
