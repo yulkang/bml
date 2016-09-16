@@ -121,12 +121,6 @@ methods
         name = strrep(name, '.', '^'); 
     end
     function [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
-        % [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
-        %
-        % add_fields: fields to add to S_file
-        % remove_fields
-        % : fields to remove from S0_file and S_file.
-        %   Field names can be either S0_file's or S_file's. 
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
