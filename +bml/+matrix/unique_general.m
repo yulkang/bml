@@ -22,23 +22,42 @@ if isempty(v0)
 end
 
 n = numel(v0);
-v = feval(class(v0), size(v0));
+% v = repmat(feval(class(v0)), size(v0));
 
-v(1) = v0(1);
-n_unique = 1;
-for ii = 2:n
-    is_unique = true;
-    for jj = 1:n_unique
-        if isequal(v(jj), v0(ii))
-            is_unique = false;
+is_unique = false(size(v0));
+is_unique(n) = true;
+
+for ii = n:-1:1
+    is_unique1 = true;
+    for jj = 1:(ii-1)
+        if isequal(v0(jj), v0(ii))
+            is_unique1 = false;
             break;
         end
     end
-    
-    if is_unique
-        n_unique = n_unique + 1;
-        v(n_unique) = v0(ii);
-    end
+    is_unique(ii) = is_unique1;
+end
+v = v0(is_unique);
+if all(is_unique(:))
+    v = reshape(v, size(v0));
 end
 
-v = v(1:n_unique);
+
+% v(1) = v0(1);
+% n_unique = 1;
+% for ii = 2:n
+%     is_unique = true;
+%     for jj = 1:n_unique
+%         if isequal(v(jj), v0(ii))
+%             is_unique = false;
+%             break;
+%         end
+%     end
+%     
+%     if is_unique
+%         n_unique = n_unique + 1;
+%         v(n_unique) = v0(ii);
+%     end
+% end
+% 
+% v = v(1:n_unique);

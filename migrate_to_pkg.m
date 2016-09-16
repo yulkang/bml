@@ -45,7 +45,7 @@ for ii = 1:n
             ix1 = ix(ii);
             file_dst = files_dst{ix1};
 
-            bml.pkg.flatten_pkg('mfiles', file_dst);
+            bml.pkg.pkg2alias('mfiles', file_dst);
             
         case 'setdiff'
             ix1 = ix(ii);
@@ -60,7 +60,7 @@ for ii = 1:n
             mkdir2(fileparts(file_dst));
             copyfile(file_src, file_dst);
 
-            bml.pkg.flatten_pkg('mfiles', file_dst);
+            bml.pkg.pkg2alias('mfiles', file_dst);
     end
 end
 end

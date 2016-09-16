@@ -7,7 +7,7 @@ if isempty(pkg)
     pth = '';
 else
     top_pkg = strsep(pkg, '.', 1);
-    info_top = what(top_pkg);
+    info_top = bml.matrix.unique_general(what(top_pkg));
     
     if numel(info_top) > 1
         n = numel(info_top);
