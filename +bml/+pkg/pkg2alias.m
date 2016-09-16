@@ -215,7 +215,7 @@ for ii = 1:n
     exist_dst = exist(dst, 'file');
     
     to_skip = false;
-    if exist_dst
+    if exist_dst && ~S.update_alias
         to_skip = true;
     else
         if S.confirm
@@ -230,7 +230,7 @@ for ii = 1:n
         % and dst is the original file, so dst must not be overwritten.
         skipped = [skipped; {mfile}]; %#ok<AGROW>
         continue;
-    else
+    elseif ~exist_dst
         % Move only if dst does not exist already.
         mkdir2(fileparts(dst));
         movefile(mfile, dst);
@@ -257,7 +257,7 @@ for ii = 1:n
         if ~exist_dst
             fprintf('Alias in %s.%s created.\n', pkg, dst);
         else
-            fprintf('Alias in %s.%s updated.\n', pkg, dst);
+            fprintf('Alias in %s.%s updated.\n', pkg, name);
         end
     end
 end
