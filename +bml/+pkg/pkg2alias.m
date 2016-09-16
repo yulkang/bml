@@ -58,13 +58,10 @@ moved = {};
 skipped = {};
 conflicts = {};
 
-%% Find root and move to it.
+%% Find root.
 [root, nam] = fileparts(GetFullPath(S.root));
 S.root = fullfile(root, nam); % To remove filesep at the end.
 pth_filesep = [S.root, filesep];
-
-% % Go to root.
-% pd = cd(S.root);
 
 %% First move all class folders
 if S.move_class
@@ -261,6 +258,3 @@ for ii = 1:n
         end
     end
 end
-
-%% Return to previous folder
-% cd(pd);
