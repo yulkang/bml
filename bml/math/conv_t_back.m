@@ -9,16 +9,16 @@ function v = conv_t_back(v, flt)
 
 assert(isvector(flt)); % Otherwise, the results will be wrong!
 flt    = flt(:);
-sumflt = sum(flt);
-cumflt = cumsum(flt);
-wt     = sumflt ./ cumflt;
+% sumflt = sum(flt);
+% cumflt = cumsum(flt);
+% wt     = nan0(sumflt ./ cumflt);
 siz    = size(v);
-
-if isvector(v)
-    v  = v(:) .* wt(:);
-elseif ismatrix(v)
-    v  = bsxfun(@times, v, wt);
-end
+% 
+% if isvector(v)
+%     v  = v(:) .* wt(:);
+% elseif ismatrix(v)
+%     v  = bsxfun(@times, v, wt);
+% end
 
 v = flipud(conv_t(flipud(v), flt));
 v = reshape(v, siz);
