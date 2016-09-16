@@ -240,6 +240,21 @@ methods
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
+    function pages = imgather(W0, opt_args, name_args)
+        % pages{pg}(row, col) = handle of the subplot.
+        
+        opt = varargin2S(opt_args, {
+            ... % 'title_subplot'
+            ... % if true, gives full title to each subplot
+            ... % if false, gives row/column/page title
+            'title_subplot', false
+            ...
+            'savefigs', true
+            });
+        S_batch = varargin2S(name_args);
+        
+        
+    end
 end
 %% Properties
 methods
