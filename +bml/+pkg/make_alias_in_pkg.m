@@ -4,7 +4,7 @@ function file = make_alias_in_pkg(file0, pkg, varargin)
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'root', pwd
+    'root', 'lib/BetterMatLab' % pwd
     'overwrite_existing', false
     'copyright_line', ''
     'copyright_name', ''
@@ -15,10 +15,10 @@ if nargin < 2
     pkg = '';
 end
 if iscell(file0) || iscell(pkg)
-    if ischar(file0)
+    if ~iscell(file0)
         file0 = {file0};
     end
-    if ischar(pkg)
+    if ~iscell(pkg)
         pkg = {pkg};
     end
     
@@ -30,12 +30,15 @@ if iscell(file0) || iscell(pkg)
 end
 
 % Get file0_full and make sure it exists as an .m file.
-assert(ischar(file0));
-if exist(file0, 'file')
-    file0_full = file0;
-else
-    file0_full = which(file0);
+if isa(file0, 'function_handle')
+    file0 = func2str(file0);
 end
+assert(ischar(file0));
+% if exist(file0, 'file') && exist(fileparts(file0), 'dir')
+%     file0_full = file0;
+% else
+    file0_full = which(file0);
+% end
 if isempty(file0_full)
     warning('%s not found!\n', file0);
     file = '';
@@ -55,7 +58,7 @@ end
 cl = file2class(file0);
 is_class = exist(cl, 'class') == 8;
 if ~is_class
-    fid = fopen(file0, 'r');
+    fid = fopen(file0_full, 'r');
     str = textscan(fid, '%s');
     is_class = ~isempty(str) && ~isempty(str{1}) && ...
         ~isempty(regexp(str{1}{1}, ...
