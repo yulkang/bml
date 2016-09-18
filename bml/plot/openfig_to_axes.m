@@ -9,6 +9,8 @@ function [ax_dst_new, h] = openfig_to_axes(file, ax_dst, varargin)
 
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
+[~,~,ext] = fileparts(file);
+if isempty(ext), file = [file, '.fig']; end
 loadedfig = openfig(file, 'invisible');
 
 ax_src = bml.plot.subplot_by_pos(loadedfig);
