@@ -15,25 +15,19 @@ function p = p_tail_convert(p0, sig, op)
 %
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
+sigL = sig < 0;
+sigR = sig > 0;
+sig0 = sig == 0;
+
+p = nan(size(p0));
+
 switch op
-    case 'BtoL'               
-        sigL = sig < 0;
-        sigR = sig > 0;
-        sig0 = sig == 0;
-        
-        p = nan(size(p0));
-        
+    case 'BtoL'                       
         p(sig0) = 0.5;
         p(sigL) = p0(sigL) / 2;
         p(sigR) = 1 - p0(sigR) / 2;
         
     case 'BtoR'               
-        sigL = sig < 0;
-        sigR = sig > 0;
-        sig0 = sig == 0;
-        
-        p = nan(size(p0));
-        
         p(sig0) = 0.5;
         p(sigL) = 1 - p0(sigL) / 2;
         p(sigR) = p0(sigR) / 2;
