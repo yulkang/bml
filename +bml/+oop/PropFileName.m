@@ -246,7 +246,7 @@ methods
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
     function [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
-        % [ax, files] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+        % [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, ...)
         %
         % INPUT:
         % row_args, col_args, page_args
@@ -321,9 +321,9 @@ methods
         Ss_page_file = W0.convert_to_S_file(Ss_page);
         
         ax = ghandles(n_row, n_col);
-        titles_row = cell(n_row, 1);
-        titles_col = cell(n_col, 1);
-        titles_page = cell(n_page, 1);
+        titles.row = cell(n_row, 1);
+        titles.col = cell(n_col, 1);
+        titles.page = cell(n_page, 1);
         files = cell(n_page, 1);
         
         S2s = bml.str.Serializer;
@@ -343,9 +343,9 @@ methods
                     S_col_file = Ss_col_file(col);
                     S_page_file = Ss_page_file(page);
                     
-                    titles_row{row} = S2s.convert(S_row_file);
-                    titles_col{col} = S2s.convert(S_col_file);
-                    titles_page{page} = S2s.convert(S_page_file);
+                    titles.row{row} = S2s.convert(S_row_file);
+                    titles.col{col} = S2s.convert(S_col_file);
+                    titles.page{page} = S2s.convert(S_page_file);
                     
                     W = feval(class(W0));
                     S = varargin2S( ...
@@ -370,13 +370,13 @@ methods
                 end
             end
             
-            if ~opt.title_subplot
+            if ~opt.title_subplot && opt.to_gltitle
                 f_title = @(s) strrep(s, '_', '-');
                 
-                gltitle(ax, 'row', f_title(titles_row));
-                gltitle(ax, 'col', f_title(titles_col));
+                gltitle(ax, 'row', f_title(titles.row));
+                gltitle(ax, 'col', f_title(titles.col));
                 gltitle(ax, 'all', bml.str.wrap_text( ...
-                    f_title(titles_page{page})));
+                    f_title(titles.page{page})));
             end
             
             if opt.savefigs
@@ -384,6 +384,7 @@ methods
                     'page', {S_page_file}
                     'row', {S2s.Ss2s(Ss_row_file)}
                     'col', {S2s.Ss2s(Ss_col_file)}
+                    'add', {add_args}
                     });
                 name = S2s.convert(S_file);
                 file = fullfile('Data', class(W), name);
