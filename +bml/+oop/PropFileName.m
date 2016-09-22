@@ -121,12 +121,6 @@ methods
         name = strrep(name, '.', '^'); 
     end
     function [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
-        % [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
-        %
-        % add_fields: fields to add to S_file
-        % remove_fields
-        % : fields to remove from S0_file and S_file.
-        %   Field names can be either S0_file's or S_file's. 
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
@@ -175,8 +169,13 @@ methods
             'mult', PFile.file_mult
             });
         
-        S_file = bml.str.Serializer.convert_to_S_file(S0_file, ...
-            S.file_fields, 'mult', S.mult);
+        if ~isscalar(S0_file)
+            S_file = arrayfun(@(S1) bml.str.Serializer.convert_to_S_file( ...
+                S1, S.file_fields, 'mult', S.mult), S0_file);
+        else
+            S_file = bml.str.Serializer.convert_to_S_file(S0_file, ...
+                S.file_fields, 'mult', S.mult);
+        end
     end
 end
 %% Get file name of a batch from a table or a dataset
@@ -245,6 +244,154 @@ methods
         S_title = W.get_S_file(args);
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
+    end
+    function [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
+        % [ax, files] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+        %
+        % INPUT:
+        % row_args, col_args, page_args
+        % : Name-value arguments to be combined along
+        %   rows, columns, and pages. 
+        %   Set as {} to have only one row/column/page.
+        %
+        % add_args
+        % : input to W.get_file(add_args).
+        %   Fields that are not properties but on the list.
+        %
+        % When there are conflicts, priority is given to
+        % the row over column over page.
+        %
+        % OUTPUT:
+        % ax(row, col)
+        % : handle of the subplot.
+        %   When there are multiple pages, only the last page is kept.
+        %
+        % files{page}
+        % : file to save the page.
+        %
+        % OPTIONS:
+        % ... % 'title_subplot'
+        % ... % if true, gives full title to each subplot
+        % ... % if false, gives row/column/page title
+        % 'title_subplot', false
+        % ...
+        % 'savefigs', true
+        % 'savefigs_args', {}
+        %
+        % EXAMPLE:
+        % imgather(W0, {
+        %     'subj', {'S1', 'S2'}
+        %     }, {
+        %     't0', {'st', 'en'}
+        %     }, {
+        %     'parad', {'RT', 'VD'}
+        %     'truncate_st_msec', {500, 700}
+        %     }, 'title_subplot', false);
+        %
+        % : subj along rows (S1 and S2), 
+        %   t0 along columns (st and en),
+        %   parad and truncate_st_msec along pages 
+        %   (RT-500, RT-700, VD-500, and VD-700),
+        %   with the option title_subplot=false.
+        
+        if nargin < 2, row_args = {}; end
+        if nargin < 3, col_args = {}; end
+        if nargin < 4, page_args = {}; end
+        if nargin < 5, add_args = {}; end
+        
+        opt = varargin2S(varargin, {
+            'clear_title', true % Clear existing title.
+            ...
+            ... % 'title_subplot'
+            ... % if true, gives full title to each subplot
+            ... % if false, gives row/column/page title
+            'title_subplot', false
+            'to_gltitle', true
+            ...
+            'savefigs', true
+            'savefigs_args', {}
+            });
+        
+        [Ss_row, n_row] = factorizeC(row_args);
+        [Ss_col, n_col] = factorizeC(col_args);
+        [Ss_page, n_page] = factorizeC(page_args);
+        
+        Ss_row_file = W0.convert_to_S_file(Ss_row);
+        Ss_col_file = W0.convert_to_S_file(Ss_col);
+        Ss_page_file = W0.convert_to_S_file(Ss_page);
+        
+        ax = ghandles(n_row, n_col);
+        titles_row = cell(n_row, 1);
+        titles_col = cell(n_col, 1);
+        titles_page = cell(n_page, 1);
+        files = cell(n_page, 1);
+        
+        S2s = bml.str.Serializer;
+        
+        for page = 1:n_page
+            clf;            
+            for row = 1:n_row
+                for col = 1:n_col
+                    ax1 = subplotRC(n_row, n_col, row, col);
+                    
+                    % row overrides col overrides page.
+                    S_row = Ss_row(row);
+                    S_col = Ss_col(col);
+                    S_page = Ss_page(page);
+                    
+                    S_row_file = Ss_row_file(row);
+                    S_col_file = Ss_col_file(col);
+                    S_page_file = Ss_page_file(page);
+                    
+                    titles_row{row} = S2s.convert(S_row_file);
+                    titles_col{col} = S2s.convert(S_col_file);
+                    titles_page{page} = S2s.convert(S_page_file);
+                    
+                    W = feval(class(W0));
+                    S = varargin2S( ...
+                            varargin2S( ...
+                                S_row, ...
+                                S_col), ...
+                            S_page);
+                    C = S2C(S);
+
+                    W = varargin2fields(W, C);
+                    file = [W.get_file(add_args), '.fig'];
+                    ax1 = openfig_to_axes(file, ax1);
+                    
+                    if opt.clear_title
+                        title(ax1, '');
+                    end
+                    if opt.title_subplot
+                        title(W.get_title(C));
+                    end
+                        
+                    ax(row,col) = ax1;
+                end
+            end
+            
+            if ~opt.title_subplot
+                f_title = @(s) strrep(s, '_', '-');
+                
+                gltitle(ax, 'row', f_title(titles_row));
+                gltitle(ax, 'col', f_title(titles_col));
+                gltitle(ax, 'all', bml.str.wrap_text( ...
+                    f_title(titles_page{page})));
+            end
+            
+            if opt.savefigs
+                S_file = varargin2S({
+                    'page', {S_page_file}
+                    'row', {S2s.Ss2s(Ss_row_file)}
+                    'col', {S2s.Ss2s(Ss_col_file)}
+                    });
+                name = S2s.convert(S_file);
+                file = fullfile('Data', class(W), name);
+                savefigs(file, opt.savefigs_args{:});
+                
+                files{page} = file;
+            end
+        end
     end
 end
 %% Properties

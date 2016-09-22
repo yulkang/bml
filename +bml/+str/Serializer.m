@@ -66,6 +66,18 @@ methods (Static)
         S2s = bml.str.Serializer(varargin{:});
         S = S2s.str2struct(S);
     end
+    function [s, S] = Ss2s(Ss, varargin)
+        fs = fieldnames(Ss);
+        S = struct;
+        for f = fs(:)'
+            vs = bml.matrix.unique_general({Ss.(f{1})});
+            if isscalar(vs)
+                vs = vs{1};
+            end
+            S.(f{1}) = vs;
+        end
+        s = bml.str.Serializer.convert(S);
+    end
 end
 %% User Interface - field name shortener/recoverer
 methods (Static)
