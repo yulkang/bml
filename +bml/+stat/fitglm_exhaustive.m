@@ -45,6 +45,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         ... % : 'AIC', 'AICc', 'BIC', 'BICc', 'CAIC' : see mdl.ModelCriterion
         'model_criterion', 'BIC' 
         'must_include', [] % Numerical indices of columns to include.
+        'must_exclude', [] % Numerical indices of columns to exclude.
         'crossval_args', {}
         'UseParallel', 'model' % 'model'|'none'
         'group', []
@@ -60,6 +61,9 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     for i_model = n_model:-1:1
         param_incl = dec2bin(i_model - 1, n_param) == '1';
         if ~isempty(S.must_include) && any(~param_incl(S.must_include))
+            model_incl(i_model) = false;
+        end
+        if ~isempty(S.must_exclude) && any(param_incl(S.must_exclude))
             model_incl(i_model) = false;
         end
         param_incl_all(i_model, :) = param_incl;
@@ -79,7 +83,8 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     if S.return_mdls
         mdl = mdls{ic_min_ix};
     else % Estimate it again
-        [~,~,mdl] = fitglm_unit(X, y, glm_args, param_incl_all(ic_min_ix,:), ...
+        [~,~,mdl] = fitglm_unit( ...
+            X, y, glm_args, param_incl_all(ic_min_ix,:), ...
             'none', {}, []);
     end
 
@@ -114,7 +119,8 @@ function [ic_all, ic_all0, param_incl_all, mdls] = ...
             parfor i_model = 1:n_model
                 param_incl = param_incl_all(i_model, :);
 
-                [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
+                [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
+                    X, y, glm_args, param_incl, ...
                     model_criterion, crossval_args, group);
 
                 ic_all(i_model) = c_ic;
@@ -128,7 +134,8 @@ function [ic_all, ic_all0, param_incl_all, mdls] = ...
             for i_model = 1:n_model
                 param_incl = param_incl_all(i_model, :);
 
-                [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
+                [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
+                    X, y, glm_args, param_incl, ...
                     model_criterion, crossval_args, group);
 
                 ic_all(i_model) = c_ic;
@@ -149,7 +156,8 @@ function [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
     switch model_criterion
         case 'crossval'
             if verLessThan('matlab', '8.6')
-                glm_args1 = [glm_args(:)', {'PredictorVars', find(param_incl)}];
+                glm_args1 = [glm_args(:)', ...
+                    {'PredictorVars', find(param_incl)}];
                 [c_ic, c_ic0] = bml.stat.crossval_glmfit(X, y, glm_args1, ...
                     'group', group, crossval_args{:});
 
@@ -157,7 +165,8 @@ function [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
                 c_ic = -c_ic;
                 c_ic0 = -c_ic0;
             else
-                glm_args1 = [glm_args(:)', {'PredictorVars',find(param_incl)}];
+                glm_args1 = [glm_args(:)', ...
+                    {'PredictorVars',find(param_incl)}];
                 [c_ic, c_ic0] = bml.stat.crossval_glmfit(X, y, glm_args1, ...
                     'group', group, crossval_args{:});
 
