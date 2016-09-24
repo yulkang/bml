@@ -167,6 +167,7 @@ methods
         S = varargin2S(varargin, {
             'file_fields', PFile.file_fields
             'mult', PFile.file_mult
+            'leave_unmatched', true % false
             });
         
         if ~isscalar(S0_file)
@@ -175,6 +176,16 @@ methods
         else
             S_file = bml.str.Serializer.convert_to_S_file(S0_file, ...
                 S.file_fields, 'mult', S.mult);
+        end
+        
+        if S.leave_unmatched
+            for ii = 1:numel(S0_file)
+                fs = setdiff(fieldnames(S0_file), ...
+                             S.file_fields(:,1), 'stable');
+                for f1 = fs(:)'
+                    S_file(ii).(f1{1}) = S0_file(ii).(f1{1});
+                end
+            end
         end
     end
 end
@@ -356,7 +367,11 @@ methods
                     C = S2C(S);
 
                     W = varargin2fields(W, C);
-                    file = [W.get_file(add_args), '.fig'];
+                    
+                    C1 = W0.convert_to_S_file(S);
+                    file_args = varargin2C(C1, add_args);
+                    file = [W.get_file(file_args), '.fig'];
+                    
                     ax1 = openfig_to_axes(file, ax1);
                     
                     if opt.clear_title
