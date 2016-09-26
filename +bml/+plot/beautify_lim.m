@@ -15,6 +15,15 @@ S = varargin2S(varargin, {
     });
 
 if isempty(S.axis_dst), S.axis_dst = S.xy; end
+if ~isscalar(S.ax)
+    for ii = 1:numel(S.ax)
+        C = varargin2C({
+            'ax', S.ax(ii)
+            }, varargin);
+        bml.plot.beautify_lim(C{:});
+    end
+    return;
+end
 
 xy = bml.plot.get_all_xy(S.ax);
 coord = xy(:, lower(S.xy) == 'xy');
