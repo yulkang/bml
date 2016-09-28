@@ -1,27 +1,39 @@
-function y = mdl_pred(mdl, vars, to_excl)
-% y = mdl_pred(mdl, vars, to_excl)
+function y = mdl_pred(mdl, varargin)
+% y = mdl_pred(mdl, ...)
+%
+% NOTE: choosing a subset of trials or vars in this function does not
+% refit the model. Use mdl_addTerms or mdl_removeTerms or similar functions
+% to refit.
 %
 % y = X(:,vars) * coef;
 %
-% vars: cell array of variable names to include
-% to_excl: exclude VARS if true. Defaults to false.
+% OPTIONS:
+% 'vars', {} % cell array of variable names
+% 'to_excl_vars', true % exclude VARS if true
+% 'tr_incl', ':'
+%
+% See also
+% : bml.stat.mdl_addTerms, bml.stat.mdl_removeTerms
+%   addTerms, removeTerms, fitglm
 
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
-if nargin < 3
-    to_excl = false;
-end
-if nargin < 2
-    vars = mdl.VariableNames(mdl.VariableInfo.InModel);
-end
-if to_excl
-    vars = setdiff(mdl.VariableNames, vars, 'stable');
-end
-incl = ismember(mdl.VariableNames, vars) & mdl.VariableInfo.InModel;
-X = table2array(mdl.Variables);
-X = X(:, incl);
+S = varargin2S(varargin, {
+    'vars', {} % cell array of variable names
+    'to_excl_vars', true % exclude VARS if true
+    'tr_incl', ':'
+    });
 
-incl_wi_inModel = strcmpfinds(vars, mdl.PredictorNames);
+if S.to_excl_vars
+    S.vars = setdiff(mdl.PredictorNames, S.vars, 'stable');
+end
+var_incl = ismember(mdl.VariableNames, S.vars) & mdl.VariableInfo.InModel;
+X = table2array(mdl.Variables);
+
+% Choose a part of X with tr_incl and var_incl
+X = X(S.tr_incl, var_incl);
+
+incl_wi_inModel = strcmpfinds(S.vars, mdl.PredictorNames);
 incl_wi_inModel = incl_wi_inModel(~isnan(incl_wi_inModel));
 
 n_tr = size(X, 1);
