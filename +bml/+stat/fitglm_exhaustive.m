@@ -2,6 +2,8 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
 % Picks the best model among all 2^n_param possible models.
 %
 % [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
+% [...] = fitglm_exhaustive(tbl, [], glm_args, varargin)
+% [...] = fitglm_exhaustive(tbl, ResposeVar, glm_args, varargin)
 %
 % OPTIONS:
 % 'model_criterion', 'BIC'
@@ -50,9 +52,33 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         'UseParallel', 'model' % 'model'|'none'
         'group', []
         'return_mdls', (nargout >= 3)
+        'verbose', true
         });
 
     % Construct param_incl_all
+    if istable(X)
+        assert(ischar(y) || isempty(y));
+        var_names = X.Properties.VariableNames;
+        if isempty(y)
+            y = table2array(X(:,end));
+            y_name = var_names{end};
+        else
+            y_name = y;
+            y = table2array(X.(y_name));
+        end
+        X = table2array(X(:, setdiff(var_names, y_name, 'stable')));
+        
+        glm_args = varargin2C({
+            'ResponseVar', y_name
+            }, glm_args);
+    else
+        assert(isnumeric(X));
+        assert(ismatrix(X));
+        
+        assert(isnumeirc(y));
+        assert(isvector(y));
+    end
+    
     n_param = size(X, 2);
     n_model = 2 ^ n_param;
     param_incl_all = false(n_model, n_param);
@@ -70,11 +96,23 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     end
 
     param_incl_all = param_incl_all(model_incl, :);
+    
+    if S.verbose
+        t_st = tic;
+        fprintf('Choosing among %d models began at %s\n', ...
+            n_model, datestr(now, 30));
+    end
 
     % Fit
     [ic_all, ic_all0, param_incl_all, mdls] = ...
         fitglm_all(X, y, glm_args, param_incl_all, S);
 
+    if S.verbose
+        t_el = toc(t_st);
+        fprintf('Chose the best among %d models in %1.1f sec at %s\n', ...
+            n_model, t_el, datestr(now, 30));
+    end
+    
     % Output
     ic_all_se = cellfun(@sem, ic_all0);
 
