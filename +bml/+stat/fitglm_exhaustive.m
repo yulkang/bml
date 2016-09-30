@@ -46,14 +46,21 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         ... % : 'crossval' : cross validates using negative log likelihood
         ... % : 'AIC', 'AICc', 'BIC', 'BICc', 'CAIC' : see mdl.ModelCriterion
         'model_criterion', 'BIC' 
-        'must_include', [] % Numerical indices of columns to include.
-        'must_exclude', [] % Numerical indices of columns to exclude.
+        'must_include', [] % Indices of columns of X to include.
+        'must_exclude', [] % Indices of columns of X to exclude.
         'crossval_args', {}
         'UseParallel', 'model' % 'model'|'none'
         'group', []
         'return_mdls', (nargout >= 3)
         'verbose', true
         });
+    
+    if islogical(S.must_include)
+        S.must_include = find(S.must_include);
+    end
+    if islogical(S.must_exclude)
+        S.must_exclude = find(S.must_exclude);
+    end
 
     % Construct param_incl_all
     if istable(X)
@@ -69,6 +76,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         X = table2array(X(:, setdiff(var_names, y_name, 'stable')));
         
         glm_args = varargin2C({
+            'VarNames', var_names
             'ResponseVar', y_name
             }, glm_args);
     else
@@ -100,7 +108,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     if S.verbose
         t_st = tic;
         fprintf('Choosing among %d models began at %s\n', ...
-            n_model, datestr(now, 30));
+            nnz(model_incl), datestr(now, 30));
     end
 
     % Fit
@@ -110,7 +118,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     if S.verbose
         t_el = toc(t_st);
         fprintf('Chose the best among %d models in %1.1f sec at %s\n', ...
-            n_model, t_el, datestr(now, 30));
+            nnz(model_incl), t_el, datestr(now, 30));
     end
     
     % Output
