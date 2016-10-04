@@ -27,7 +27,7 @@ function v = conv_t(a, b, varargin)
 % 2014 (c) Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'to_use_fconv', false
+    'to_use_fconv', []
     'len', size(a,1)
     'ix0', 1
     });
@@ -35,7 +35,9 @@ S = varargin2S(varargin, {
 len = S.len;
 ix0 = S.ix0;
 
-assert(isvector(b)); % Otherwise, the results will be wrong!
+if isempty(S.to_use_fconv)
+    S.to_use_fconv = ~isvector(b);
+end
 
 if isvector(a)
     if S.to_use_fconv
@@ -51,11 +53,15 @@ else % if ismatrix(a)
     nCol = prod(siz(2:end));
     a = reshape(a, size(a,1), []);
     
-    b = b(:);
+    if isvector(b)
+        b = b(:);
+    else
+        b = reshape(b, size(b,1), []);
+    end
     v = zeros(size(a,1) + size(b,1) - 1, nCol);
     
     if S.to_use_fconv
-        v = fconv(a, b);
+        v = fconv1(a, b);
     else
         for ii = 1:size(a,2)
             v(:,ii) = conv(a(:,ii), b);
