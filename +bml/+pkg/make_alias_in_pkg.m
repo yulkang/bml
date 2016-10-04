@@ -124,6 +124,6 @@ fclose(fid);
 
 % Print results.
 if S.verbose >= 1
-    fprintf('Made an alias of\n  %s\nat\n  %s\n', file0_full, file);
+    fprintf('Made an alias of\n  %s\nat\n  %s\n\n', file0_full, file);
 end
 end
