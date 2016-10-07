@@ -34,11 +34,11 @@ if isa(file0, 'function_handle')
     file0 = func2str(file0);
 end
 assert(ischar(file0));
-% if exist(file0, 'file') && exist(fileparts(file0), 'dir')
-%     file0_full = file0;
-% else
+if exist(file0, 'file') && exist(fileparts(file0), 'dir')
+    file0_full = file0;
+else
     file0_full = which(file0);
-% end
+end
 if isempty(file0_full)
     warning('%s not found!\n', file0);
     file = '';
