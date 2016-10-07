@@ -104,7 +104,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         assert(isnumeric(X));
         assert(ismatrix(X));
         
-        assert(isnumeirc(y));
+        assert(isnumeric(y) || islogical(y));
         assert(isvector(y));
     end
     
