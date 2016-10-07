@@ -71,7 +71,11 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         ... % : Used in cross-validation.
         ... %   Leave empty to treat each unique row as its own group.
         'group',           [] 
-        'UseParallel',     'model' % 'model'|'none'
+        ...
+        ... % 'UseParallel'
+        ... % : 'auto'|'model'|'none'
+        ... %   'auto' by default. Chooses 'model' if n_model > 1000
+        'UseParallel',     'auto' 
         'verbose',         true
         'return_mdls',     (nargout >= 3)
         });
@@ -92,7 +96,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
             y_name = var_names{end};
         else
             y_name = y;
-            y = table2array(X.(y_name));
+            y = X.(y_name);
         end
         X = table2array(X(:, setdiff(var_names, y_name, 'stable')));
         
@@ -130,6 +134,14 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         t_st = tic;
         fprintf('Choosing among %d models began at %s\n', ...
             nnz(model_incl), datestr(now, 30));
+    end
+    
+    if strcmp(S.UseParallel, 'auto')
+        if nnz(model_incl) > 1000
+            S.UseParallel = 'model';
+        else
+            S.UseParallel = 'none';
+        end
     end
 
     % Fit
