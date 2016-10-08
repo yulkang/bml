@@ -124,38 +124,47 @@ methods
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
-        if bml.matrix.is_cc(PFile.file_fields)
-            file_fields0 = bml.matrix.cc2cmat(PFile.file_fields);
-            file_fields = file_fields0(:, [1 2]);
-            file_mult = file_fields0(:, [1 3]);
-        else
+%         if bml.matrix.is_cc(PFile.file_fields)
+%             file_fields0 = bml.matrix.cc2cmat(PFile.file_fields);
+%             file_fields = file_fields0(:, [1 2]);
+%             file_mult = file_fields0(:, [1 3]);
+%         else
             file_fields = PFile.file_fields;
-            file_mult = PFile.file_mult;
-        end
+%             file_mult = PFile.file_mult;
+%         end
+
+        S0_file = PFile.get_S0_file;
+        
         
         if isempty(file_fields)
             S_file = struct;
-            S0_file = struct;
         else
             [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
             [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
             ia = intersect(ia1, ia2, 'stable');
-            
             file_fields = file_fields(ia, :);
-            if ~isempty(file_mult)
-                [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
-                file_mult = file_mult(ia, :);
-            end
-        
-            [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
-                file_fields, ...
-                'mult', file_mult);
+            
+            S_file = bml.str.Serializer.field_strrep(S0_file, file_fields);
+            
+%             if ~isempty(file_mult)
+%                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
+%                 file_mult = file_mult(ia, :);
+%             end
+%         
+%             [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
+%                 file_fields, ...
+%                 'mult', file_mult);
         end
         
         S_file = varargin2S(add_fields, S_file);
     end
-    function S0_file = get_S0_file(PFile, varargin)
-        [~, S0_file] = PFile.get_S_file(varargin{:});
+    function S0_file = get_S0_file(PFile)
+        C = PFile.get_file_fields;
+        if isempty(C)
+            S0_file = struct;
+        else
+            S0_file = copyprops(struct, PFile, 'props', C(:,1));
+        end
     end
     function S0_file = convert_from_S_file(PFile, S_file)
         % TODO: Make consistent with get_S_file regarding cc and cmat
