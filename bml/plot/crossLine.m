@@ -61,8 +61,10 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
 end
 
 %% Save xlim and ylim
-xLim = xlim(ax);
-yLim = ylim(ax);
+xLim0 = xlim(ax);
+yLim0 = ylim(ax);
+xLim = [-1,1] * 1e10;
+yLim = [-1,1] * 1e10;
 hold(ax, 'on');
 
 if nargin < 2
@@ -108,6 +110,6 @@ end
 
 %% Revert xlim and ylim
 hold(ax, 'off');
-xlim(ax, xLim);
-ylim(ax, yLim);
+xlim(ax, xLim0);
+ylim(ax, yLim0);
 end
