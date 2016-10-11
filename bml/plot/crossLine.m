@@ -33,7 +33,7 @@ else
 end 
 
 if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
-        && (length(varargin) <= 1)
+        && ((length(varargin) <= 1) || isnumeric(varargin{1}))
     
     if isempty(varargin)
         v = 0;
@@ -41,17 +41,23 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
         v = varargin{1};
     end
     if isscalar(v)
+        if numel(varargin) <= 1
+            color = [0 0 0];
+        else
+            color = varargin{2};
+        end
+        
         try
             switch vh
                 case 'h'
                     ax.YBaseline.Visible = 'on';
                     ax.YBaseline.BaseValue = v;
-                    ax.YBaseline.Color = [0 0 0];
+                    ax.YBaseline.Color = color;
 
                 case 'v'
                     ax.XBaseline.Visible = 'on';
                     ax.XBaseline.BaseValue = v;
-                    ax.XBaseline.Color = [0 0 0];
+                    ax.XBaseline.Color = color;
             end
             return;
         catch err
