@@ -97,11 +97,15 @@ methods
 end
 %% Files
 methods
-    function [file, name] = get_file_from_S0(PFile, S0, remove_fields)
+    function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
+        if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
-        [file, name] = PFile.get_file(PFile.convert_to_S_file(S0), ...
-            remove_fields);
+        add_fields = varargin2S( ...
+            add_fields, ...
+            PFile.convert_to_S_file(S0));
+        
+        [file, name] = PFile.get_file(add_fields, remove_fields);
     end
     function [file, name] = get_file(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
