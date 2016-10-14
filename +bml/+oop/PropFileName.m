@@ -148,7 +148,8 @@ methods
             ia = intersect(ia1, ia2, 'stable');
             file_fields = file_fields(ia, :);
             
-            S_file = bml.str.Serializer.field_strrep(S0_file, file_fields);
+            S2s = bml.str.Serializer;
+            S_file = S2s.field_strrep(S0_file, file_fields);
             
 %             if ~isempty(file_mult)
 %                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
