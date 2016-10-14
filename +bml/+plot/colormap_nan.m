@@ -1,5 +1,9 @@
 function colormap_nan(varargin)
 % Sets palette such that NaNs are white
+%
+% 'h_img', []
+% 'h_col', []
+% 'bkg', [1 1 1] % Background color
 
 %%
 S = varargin2S(varargin, {
@@ -14,12 +18,18 @@ if isempty(S.h_img)
 else
     h_img = S.h_img;
 end
+
+if strcmp(get(h_img, 'Type'), 'axes')
+    h_img = findobj(h_img, 'Type', 'Image');
+end
+assert(strcmpi(get(h_img, 'Type') ,'Image'));
+h_ax = get(h_img, 'Parent');
+
 if isempty(S.h_col)
-    h_col = findobj(gcf, 'Type', 'colorbar');
+    h_col = findobj(h_ax, 'Type', 'colorbar');
 else
     h_col = S.h_col;
 end
-h_ax = get(h_img, 'Parent');
 
 %% Convert CDataMapping to direct
 cmap0 = colormap(h_ax);
