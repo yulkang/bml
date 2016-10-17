@@ -235,11 +235,16 @@ classdef VisitableTree < DeepCopyable
     end
     %% Saving-related methods.
     methods
-        function Tree = obj2struct(Tree0)
+        function Tree = obj2struct(Tree0, props_to_skip)
+            if ~exist('props_to_skip', 'var')
+                props_to_skip = {};
+            end
+            props_to_skip = union(props_to_skip, {'root'});
+            
             Tree = copy(Tree0);
             Tree.empty_links_;
             Tree = bml.oop.copyprops(struct, Tree, ...
-                'props_to_skip', {'root'});
+                'props_to_skip', props_to_skip);
         end
         function empty_links_(Tree)
             Tree.set_root_([]);
