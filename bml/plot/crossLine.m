@@ -41,10 +41,10 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
         v = varargin{1};
     end
     if isscalar(v)
-        if numel(varargin) <= 1
-            color = [0 0 0];
+        if numel(varargin) < 2
+            plot_opt = {};
         else
-            color = varargin{2};
+            plot_opt = varargin2plot(parsePlotSpec(varargin(2)));
         end
         
         try
@@ -52,12 +52,18 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
                 case 'h'
                     ax.YBaseline.Visible = 'on';
                     ax.YBaseline.BaseValue = v;
-                    ax.YBaseline.Color = color;
+                    
+                    if ~isempty(plot_opt)
+                        set(ax.YBaseline, plot_opt{:});
+                    end
 
                 case 'v'
                     ax.XBaseline.Visible = 'on';
                     ax.XBaseline.BaseValue = v;
-                    ax.XBaseline.Color = color;
+                    
+                    if ~isempty(plot_opt)
+                        set(ax.XBaseline, plot_opt{:});
+                    end
             end
             return;
         catch err
