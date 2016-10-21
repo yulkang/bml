@@ -1,5 +1,10 @@
 function [train, test] = crossvaltf(meth, n_sim, group, varargin)
-% [train, test] = crossvalind(meth, n_sim, group, varargin)
+% [train, test] = crossvalind(method, n_sim, group, varargin)
+%
+% method
+% 'KfoldConsec': Kfold using consecutive parts.
+% 'HoldOut'
+% % Other methods are under construction.
 %
 % train(TR, SIM) : true if TR is included in the training set
 %                  on the SIM-th simulation.
@@ -17,11 +22,30 @@ test = false(n_tr, n_sim);
 
 if isempty(group)
     group = ones(n_tr, 1);
+else
+    [~,~,group] = unique(group, 'rows');
 end
 
 switch meth
     case 'Kfold'
         error('Not implemented yet!');
+        
+    case 'KfoldConsec'
+        n_group = max(group);
+        rel_in_group = zeros(n_tr, 1);
+        for i_group = 1:n_group
+            in_group = group == i_group;
+            n_in_group = nnz(in_group);
+            rel_in_group(in_group) = (1:n_in_group)' / n_in_group;
+        end
+        for i_sim = 1:n_sim
+            rel_st = (i_sim - 1) / n_sim;
+            rel_en = i_sim / n_sim;
+            
+            test(:,i_sim) = (rel_in_group > rel_st) ...
+                          & (rel_in_group <= rel_en);
+            train(:,i_sim) = ~test(:,i_sim);
+        end
         
     case 'HoldOut'
         for i_sim = 1:n_sim

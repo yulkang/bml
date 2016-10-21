@@ -196,7 +196,9 @@ function [ic_all, ic_all0, param_incl_all, mdls] = ...
     model_criterion = S.model_criterion;
     crossval_args = S.crossval_args;
     if isempty(S.group)
-        [~, ~, group] = unique(X, 'rows');
+        n = size(X, 1);
+        group = ones(n, 1);
+%         [~, ~, group] = unique(X, 'rows');
     else
         group = S.group;
     end
