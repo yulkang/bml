@@ -169,6 +169,14 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
 
     param_incl = param_incl_all(ic_min_ix, :);
 
+    % Reduce output size
+    param_incl = bin2dec(char(param_incl + '0'));
+    if ~strcmp(S.model_criterion, 'crossval')
+        ic_all_se = [];
+        ic_all0 = {};
+    end
+    
+    % Pack output
     info = packStruct(param_incl, ic_min, ic_min_ix, ...
         ic_all, param_incl_all, ...
         ic_all0, ic_all_se);
