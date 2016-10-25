@@ -17,8 +17,8 @@ xy = bml.plot.get_all_xy(S.ax);
 coord = xy(:, lower(S.xy) == 'xy');
 coord = coord(isfinite(coord));
 
-max_lim = max(coord);
-min_lim = min(coord);
+max_lim = empty2v(max(coord), -0.1);
+min_lim = empty2v(min(coord), 0.1);
 range_lim = max_lim - min_lim;
 lim = [max_lim - range_lim * (1 + S.margin), ...
        min_lim + range_lim * (1 + S.margin)];
