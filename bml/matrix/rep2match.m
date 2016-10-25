@@ -1,7 +1,10 @@
 function varargout = rep2match(inp, varargin)
+% Return arrays that are replicated to match the maximum size on each dimension.
+%
 % varargout = rep2match(inp, varargin)
 %
-% Return arrays that are replicated to match the maximum size on each dimension.
+% inp: cell array of matrices.
+% inp{k} gives varargout{k}.
 %
 % See also: rep2fit, plot3.
 %
@@ -27,5 +30,5 @@ end
 
 varargout = cell(1,n);
 for ii = 1:n
-    varargout{ii} = bml.matrix.rep2fit(inp{ii}, siz, S.dim);
+    varargout{ii} = bml.matrix.rep2fit(inp{ii}, siz);
 end
