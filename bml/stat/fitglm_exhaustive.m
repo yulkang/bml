@@ -150,7 +150,9 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     end
     
     if strcmp(S.UseParallel, 'auto')
-        if nnz(model_incl) > 1000
+        if (nnz(model_incl) > 1000) ...
+                || ((nnz(model_incl) > 100)  ...
+                    && strcmp(S.model_criterion, 'crossval'))
             S.UseParallel = 'model';
         else
             S.UseParallel = 'none';
@@ -176,7 +178,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         mdl = mdls{ic_min_ix};
     else % Estimate it again
         [~,~,mdl] = fitglm_unit( ...
-            X, y, glm_args, param_incl_all(ic_min_ix,:), ...
+            X, y, glm_args, param_incl_all(ic_min_ix), ...
             'none', {}, []);
         mdls = {};
     end
@@ -201,7 +203,6 @@ function [ic_all, ic_all0, mdls] = ...
         fitglm_all(X, y, glm_args, param_incl_all, S)
     
     n_model = length(param_incl_all);
-    n_param = size(X, 2);
 
     ic_all = zeros(n_model, 1);
     ic_all0 = cell(n_model, 1);
@@ -226,11 +227,8 @@ function [ic_all, ic_all0, mdls] = ...
     switch S.UseParallel
         case 'model'
             parfor i_model = 1:n_model
-                param_incl = ...
-                    dec2bin(param_incl_all(i_model), n_param) == '1';
-
                 [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
-                    X, y, glm_args, param_incl, ...
+                    X, y, glm_args, param_incl_all(i_model), ...
                     model_criterion, crossval_args, group);
 
                 ic_all(i_model) = c_ic;
@@ -242,11 +240,8 @@ function [ic_all, ic_all0, mdls] = ...
             end
         otherwise
             for i_model = 1:n_model
-                param_incl = ...
-                    dec2bin(param_incl_all(i_model), n_param) == '1';
-
                 [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
-                    X, y, glm_args, param_incl, ...
+                    X, y, glm_args, param_incl_all(i_model), ...
                     model_criterion, crossval_args, group);
 
                 ic_all(i_model) = c_ic;
@@ -261,6 +256,10 @@ end
 function [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
     model_criterion, crossval_args, group)
 
+    n_param = size(X, 2);
+    param_incl = ...
+        dec2bin(param_incl, n_param) == '1';
+    
     c_mdl = fitglm(X, y, glm_args{:}, ...
         'PredictorVars', find(param_incl));
 
