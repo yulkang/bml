@@ -125,22 +125,22 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         assert(isvector(y));
     end
     
+    MAX_N_PARAM = 64; % Using uint64 internally.
     n_param = size(X, 2);
-    n_model = 2 ^ n_param;
-    param_incl_all = false(n_model, n_param);
+    assert(n_param <= MAX_N_PARAM);
+    n_model = uint64(2 ^ n_param);
+    param_incl_all = uint64(1:n_model)' - 1;
     model_incl = true(n_model, 1);
-
-    for i_model = n_model:-1:1
-        param_incl = dec2bin(i_model - 1, n_param) == '1';
-        if ~isempty(S.must_include) && any(~param_incl(S.must_include))
-            model_incl(i_model) = false;
-        end
-        if ~isempty(S.must_exclude) && any(param_incl(S.must_exclude))
-            model_incl(i_model) = false;
-        end
-        param_incl_all(i_model, :) = param_incl;
+    for shift1 = S.must_include(:)'
+        bit1 = bitshift(1, shift1 - 1, 'uint64');
+        model_incl = model_incl ...
+            & bitand(param_incl_all, bit1);
     end
-
+    for shift1 = S.must_exclude(:)'
+        bit1 = bitshift(1, shift1 - 1, 'uint64');
+        model_incl = model_incl ...
+            & ~bitand(param_incl_all, bit1);
+    end
     param_incl_all = param_incl_all(model_incl, :);
     
     if S.verbose
@@ -158,7 +158,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     end
 
     % Fit
-    [ic_all, ic_all0, param_incl_all, mdls] = ...
+    [ic_all, ic_all0, mdls] = ...
         fitglm_all(X, y, glm_args, param_incl_all, S);
 
     if S.verbose
@@ -178,13 +178,12 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         [~,~,mdl] = fitglm_unit( ...
             X, y, glm_args, param_incl_all(ic_min_ix,:), ...
             'none', {}, []);
+        mdls = {};
     end
 
-    param_incl = param_incl_all(ic_min_ix, :);
+    param_incl = param_incl_all(ic_min_ix);
 
     % Reduce output size
-    param_incl = bin2dec(char(param_incl + '0'));
-    param_incl_all = bin2dec(char(param_incl_all + '0'));
     if ~strcmp(S.model_criterion, 'crossval')
         ic_all_se = [];
         ic_all0 = {};
@@ -198,16 +197,19 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         ic_all0, ic_all_se);
     info = copyFields(info, S);
 end
-function [ic_all, ic_all0, param_incl_all, mdls] = ...
+function [ic_all, ic_all0, mdls] = ...
         fitglm_all(X, y, glm_args, param_incl_all, S)
     
-    n_model = size(param_incl_all, 1);
+    n_model = length(param_incl_all);
+    n_param = size(X, 2);
 
     ic_all = zeros(n_model, 1);
     ic_all0 = cell(n_model, 1);
 
-    mdls = cell(n_model, 1);
     return_mdls = S.return_mdls;
+    if return_mdls
+        mdls = cell(n_model, 1);
+    end
     
     model_criterion = S.model_criterion;
     crossval_args = S.crossval_args;
@@ -222,7 +224,8 @@ function [ic_all, ic_all0, param_incl_all, mdls] = ...
     switch S.UseParallel
         case 'model'
             parfor i_model = 1:n_model
-                param_incl = param_incl_all(i_model, :);
+                param_incl = ...
+                    dec2bin(param_incl_all(i_model), n_param) == '1';
 
                 [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
                     X, y, glm_args, param_incl, ...
@@ -237,7 +240,8 @@ function [ic_all, ic_all0, param_incl_all, mdls] = ...
             end
         otherwise
             for i_model = 1:n_model
-                param_incl = param_incl_all(i_model, :);
+                param_incl = ...
+                    dec2bin(param_incl_all(i_model), n_param) == '1';
 
                 [c_ic, c_ic0, c_mdl] = fitglm_unit( ...
                     X, y, glm_args, param_incl, ...

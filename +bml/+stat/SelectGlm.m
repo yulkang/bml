@@ -1,6 +1,7 @@
-classdef SelectGlm < matlab.mixin.Copyable
+classdef SelectGlm < DeepCopyable
 %% Settings
 properties
+    glm_args = {'Distribution', 'binomial'};
     model_criterion = 'BIC';
     must_include = [];
     must_exclude = [];
@@ -42,15 +43,47 @@ methods
             Glm.mdls = L.mdls;
         end
     end
-    function param_incl = get_param_incl_tf(~, info_mdl)
+    function param_incl = get_param_incl_tf(Glm, param_incl)
         % param_incl = get_param_incl_tf(~, info_mdl)
+        if nargin < 2
+            param_incl = Glm.param_incl;
+        end
         param_incl = logical( ...
-            dec2bin(info_mdl.param_incl, info_mdl.n_param) ...
+            dec2bin(param_incl, Glm.n_param) ...
             - '0');
     end
-    function rerun_fitglm_exhaustive(~, mdl, info_mdl)
-        X = mdl.Variables;
+    function Glm = rerun_fitglm_exhaustive_w_selected_param_incl(Glm0, ...
+            varargin)
+        X = Glm0.mdl.Variables;
+        y = Glm0.mdl.ResponseName;
+        param_incl = Glm0.get_param_incl_tf;
+        must_include = find(param_incl);
+        must_exclude = find(~param_incl);
         
+        Glm = Glm0.deep_copy;
+        Glm.init(varargin{:});
+        Glm.fit(X, y, {
+            'must_include', must_include
+            'must_exclude', must_exclude
+            });
+    end
+    function fit(Glm, X, y, varargin)
+        C = varargin2C(varargin, ...
+                copyprops(struct, Glm, 'props', {
+                    'model_criterion'
+                    'must_include'
+                    'must_exclude'
+                    'group'
+                    'UseParallel'
+                    'verbose'
+                    'return_mdls'
+                    'var_names'
+                    'n_param'
+                    }));
+        [mdl, info, mdls] = fitglm_exhaustive(X, y, Glm.glm_args, C{:});
+        copyprops(Glm, info, true);
+        Glm.mdl = mdl;
+        Glm.mdls = mdls;
     end
 end
 end
