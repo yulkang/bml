@@ -6,6 +6,7 @@ properties
     must_include = [];
     must_exclude = [];
     group = [];
+    crossval_args = {};
     UseParallel = 'auto';
     verbose = 1;
     return_mdls = false;
@@ -68,12 +69,15 @@ methods
             });
     end
     function fit(Glm, X, y, varargin)
-        C = varargin2C(varargin, ...
+        C = varargin2C(varargin2C(varargin, {
+                    'UseParallel', 'never'
+                }), ...
                 copyprops(struct, Glm, 'props', {
                     'model_criterion'
                     'must_include'
                     'must_exclude'
                     'group'
+                    'crossval_args'
                     'UseParallel'
                     'verbose'
                     'return_mdls'
