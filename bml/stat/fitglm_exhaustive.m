@@ -209,6 +209,8 @@ function [ic_all, ic_all0, mdls] = ...
     return_mdls = S.return_mdls;
     if return_mdls
         mdls = cell(n_model, 1);
+    else
+        mdls = {};
     end
     
     model_criterion = S.model_criterion;
