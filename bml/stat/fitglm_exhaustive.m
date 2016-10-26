@@ -90,6 +90,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
         'UseParallel',     'auto' 
         'verbose',         true
         'return_mdls',     (nargout >= 3)
+        'save_ic_all0',    false
         });
     
     if islogical(S.must_include)
@@ -183,13 +184,16 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
 
     % Reduce output size
     param_incl = bin2dec(char(param_incl + '0'));
+    param_incl_all = bin2dec(char(param_incl_all + '0'));
     if ~strcmp(S.model_criterion, 'crossval')
         ic_all_se = [];
+        ic_all0 = {};
+    elseif ~S.save_ic_all0
         ic_all0 = {};
     end
     
     % Pack output
-    info = packStruct(param_incl, ic_min, ic_min_ix, ...
+    info = packStruct(n_param, param_incl, ic_min, ic_min_ix, ...
         ic_all, param_incl_all, ...
         ic_all0, ic_all_se);
     info = copyFields(info, S);
