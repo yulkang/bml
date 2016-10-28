@@ -145,7 +145,6 @@ methods
 
         S0_file = PFile.get_S0_file;
         
-        
         if isempty(file_fields)
             S_file = struct;
         else
