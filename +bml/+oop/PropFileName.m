@@ -27,6 +27,9 @@ properties (Dependent)
     % file_mult = {
     %   'prop_name', multiply_from_prop2filename
     file_mult
+    
+    S0_file
+    S_file
 end
 %% Names from multiple files
 methods
@@ -124,6 +127,9 @@ methods
         % Prevent erroneous behavior regarding extensions.
         name = strrep(name, '.', '^'); 
     end
+    function S_file = get.S_file(PFile)
+        S_file = PFile.get_S_file;
+    end
     function [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
@@ -162,6 +168,9 @@ methods
         end
         
         S_file = varargin2S(add_fields, S_file);
+    end
+    function S0_file = get.S0_file(PFile)
+        S0_file = PFile.get_S0_file;
     end
     function S0_file = get_S0_file(PFile)
         C = PFile.get_file_fields;
