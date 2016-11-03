@@ -278,8 +278,8 @@ methods
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
-    function [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
-        % [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+    function [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
+        % [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, ...)
         %
         % INPUT:
         % row_args, col_args, page_args
@@ -295,12 +295,15 @@ methods
         % the row over column over page.
         %
         % OUTPUT:
-        % ax(row, col)
+        % axs{page}(row, col)
         % : handle of the subplot.
         %   When there are multiple pages, only the last page is kept.
         %
         % files{page}
         % : file to save the page.
+        %
+        % titles{page}
+        % : struct containing page, row, and column titles
         %
         % OPTIONS:
         % ... % 'title_subplot'
@@ -310,6 +313,8 @@ methods
         % ...
         % 'savefigs', true
         % 'savefigs_args', {}
+        % ...
+        % 'to_clf', true % Set false to retrieve ax of multiple pages
         %
         % EXAMPLE:
         % imgather(W0, {
@@ -331,6 +336,26 @@ methods
         if nargin < 3, col_args = {}; end
         if nargin < 4, page_args = {}; end
         if nargin < 5, add_args = {}; end
+
+        [Ss_page, n_page] = factorizeC(page_args);
+        Ss_page_file = W0.convert_to_S_file(Ss_page);
+        
+        axs = cell(n_page, 1);
+        files = cell(n_page, 1);
+        titles = cell(n_page, 1);
+        for page = 1:n_page
+            page_args = varargin2C(Ss_page_file(page));
+            
+            [axs{page}, files{page}, titles{page}] = ...
+                W0.imgather_page(row_args, col_args, page_args, add_args, ...
+                    varargin{:});
+        end
+    end
+    function [ax, file, titles] = imgather_page(W0, row_args, col_args, page_args, add_args, varargin)
+        if nargin < 2, row_args = {}; end
+        if nargin < 3, col_args = {}; end
+        if nargin < 4, page_args = {}; end
+        if nargin < 5, add_args = {}; end
         
         opt = varargin2S(varargin, {
             'clear_title', true % Clear existing title.
@@ -343,92 +368,93 @@ methods
             ...
             'savefigs', true
             'savefigs_args', {}
-            });
+            ...
+            'to_clf', true % Set false to retrieve ax of multiple pages
+            });        
         
         [Ss_row, n_row] = factorizeC(row_args);
         [Ss_col, n_col] = factorizeC(col_args);
-        [Ss_page, n_page] = factorizeC(page_args);
+        S_page = varargin2S(page_args);
         
         Ss_row_file = W0.convert_to_S_file(Ss_row);
         Ss_col_file = W0.convert_to_S_file(Ss_col);
-        Ss_page_file = W0.convert_to_S_file(Ss_page);
+        
+        % A single page
+        S_page_file = W0.convert_to_S_file(S_page);
         
         ax = ghandles(n_row, n_col);
         titles.row = cell(n_row, 1);
         titles.col = cell(n_col, 1);
-        titles.page = cell(n_page, 1);
-        files = cell(n_page, 1);
+        titles.page = '';
         
         S2s = bml.str.Serializer;
         
-        for page = 1:n_page
+        if opt.to_clf
             clf;            
-            for row = 1:n_row
-                for col = 1:n_col
-                    ax1 = subplotRC(n_row, n_col, row, col);
-                    
-                    % row overrides col overrides page.
-                    S_row = Ss_row(row);
-                    S_col = Ss_col(col);
-                    S_page = Ss_page(page);
-                    
-                    S_row_file = Ss_row_file(row);
-                    S_col_file = Ss_col_file(col);
-                    S_page_file = Ss_page_file(page);
-                    
-                    titles.row{row} = S2s.convert(S_row_file);
-                    titles.col{col} = S2s.convert(S_col_file);
-                    titles.page{page} = S2s.convert(S_page_file);
-                    
-                    W = feval(class(W0));
-                    S = varargin2S( ...
-                            varargin2S( ...
-                                S_row, ...
-                                S_col), ...
-                            S_page);
-                    C = S2C(S);
+        else
+            figure;
+        end
+        for row = 1:n_row
+            for col = 1:n_col
+                ax1 = subplotRC(n_row, n_col, row, col);
 
-                    W = varargin2fields(W, C);
-                    
-                    C1 = W0.convert_to_S_file(S);
-                    file_args = varargin2C(C1, add_args);
-                    file = [W.get_file(file_args), '.fig'];
-                    
-                    ax1 = openfig_to_axes(file, ax1);
-                    
-                    if opt.clear_title
-                        title(ax1, '');
-                    end
-                    if opt.title_subplot
-                        title(W.get_title(C));
-                    end
-                        
-                    ax(row,col) = ax1;
+                % row overrides col overrides page.
+                S_row = Ss_row(row);
+                S_col = Ss_col(col);
+
+                S_row_file = Ss_row_file(row);
+                S_col_file = Ss_col_file(col);
+
+                titles.row{row} = S2s.convert(S_row_file);
+                titles.col{col} = S2s.convert(S_col_file);
+                titles.page = S2s.convert(S_page_file);
+
+                W = feval(class(W0));
+                S = varargin2S( ...
+                        varargin2S( ...
+                            S_row, ...
+                            S_col), ...
+                        S_page);
+                C = S2C(S);
+
+                W = varargin2fields(W, C);
+
+                C1 = W0.convert_to_S_file(S);
+                file_args = varargin2C(C1, add_args);
+                file = [W.get_file(file_args), '.fig'];
+
+                ax1 = openfig_to_axes(file, ax1);
+
+                if opt.clear_title
+                    title(ax1, '');
                 end
+                if opt.title_subplot
+                    title(W.get_title(C));
+                end
+
+                ax(row,col) = ax1;
             end
-            
-            if ~opt.title_subplot && opt.to_gltitle
-                f_title = @(s) strrep(s, '_', '-');
-                
-                gltitle(ax, 'row', f_title(titles.row));
-                gltitle(ax, 'col', f_title(titles.col));
-                gltitle(ax, 'all', bml.str.wrap_text( ...
-                    f_title(titles.page{page})));
-            end
-            
-            if opt.savefigs
-                S_file = varargin2S({
-                    'page', {S_page_file}
-                    'row', {S2s.Ss2s(Ss_row_file)}
-                    'col', {S2s.Ss2s(Ss_col_file)}
-                    'add', {add_args}
-                    });
-                name = S2s.convert(S_file);
-                file = fullfile('Data', class(W), name);
-                savefigs(file, opt.savefigs_args{:});
-                
-                files{page} = file;
-            end
+        end
+
+        if ~opt.title_subplot && opt.to_gltitle
+            f_title = @(s) strrep(s, '_', '-');
+
+            gltitle(ax, 'row', f_title(titles.row));
+            gltitle(ax, 'col', f_title(titles.col));
+            gltitle(ax, 'all', bml.str.wrap_text( ...
+                f_title(titles.page{page})));
+        end
+
+        if opt.savefigs
+            S_file = varargin2S({
+                'page', {S_page_file}
+                'row', {S2s.Ss2s(Ss_row_file)}
+                'col', {S2s.Ss2s(Ss_col_file)}
+                'add', {add_args}
+                });
+            name = S2s.convert(S_file);
+            file = fullfile('Data', class(W), name);
+            savefigs(file, opt.savefigs_args{:});
         end
     end
 end
