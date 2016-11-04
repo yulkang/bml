@@ -217,6 +217,8 @@ methods (Static)
     function [files, desc, info] = ls(filt, varargin)
         % [files, desc, info] = ls(filt, varargin)
         %
+        % filt: filter string or a cell array of file paths.
+        %
         % OPTIONS
         % -------
         % 'allof', []
@@ -241,6 +243,7 @@ methods (Static)
             'props', {} % properties of Serializer
             'fullpath', true
             });
+        is_filt_list = iscell(filt);
 
         S2s = bml.str.Serializer(opt.props{:});
         
@@ -257,8 +260,12 @@ methods (Static)
             opt.(f{1}) = v;
         end
         
-        info = vVec(dir(filt));
-        files = vVec({info.name});
+        if ~is_filt_list
+            info = vVec(dir(filt));
+            files = vVec({info.name});
+        else
+            files = filt;
+        end
         n = numel(files);
         
         desc = S2s.fileparts(files);
@@ -288,9 +295,11 @@ methods (Static)
         
         files = files(incl);
         desc = desc(incl);
-        info = info(incl);
+        if ~is_filt_list
+            info = info(incl);
+        end
         
-        if opt.fullpath
+        if opt.fullpath && ~is_filt_list
             pth = bml.file.filt2dir(filt);
             files = fullfile(pth, files);
         end
