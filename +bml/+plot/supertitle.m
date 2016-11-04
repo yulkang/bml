@@ -1,4 +1,15 @@
 function h = supertitle(ax, str, varargin)
+% h = supertitle(ax, str, varargin)
+%
+% 'location', 'north' % 'north'|'south'|'west'|'east'
+% 'margin', 0.01
+% 'height', 0.1
+% 'margin_unit', 'relative'
+% 'height_unit', 'relative'
+% 'options', {}
+
+% 2016 (c) Yul Kang. hk2699 at columbia dot edu.
+
 S = varargin2S(varargin, {
     'location', 'north' % 'north'|'south'|'west'|'east'
     'margin', 0.01
