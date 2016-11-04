@@ -172,7 +172,12 @@ if nar < N
             %%
             
             % now draw from the 1-d normal truncated to [lb, ub]
-            x(i) = mui+TruncatedGaussian(-sqrt(s2i),[lb ub]-mui);
+            try
+                x(i) = mui+TruncatedGaussian(-sqrt(s2i),[lb ub]-mui);
+            catch
+                x(i) = mui + bml.distrib.normrnd_trunc( ...
+                    -sqrt(s2i), [lb, ub] - mui);
+            end
         end
         if discard <= 0
             n = n + 1;
