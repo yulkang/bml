@@ -12,6 +12,10 @@ S = varargin2S(varargin, {
     'axis_dst', []
     'ax', gca
     'margin', 0.1
+    ... % 'lim_from'
+    ... % - 'points': get limits from the data in the plot
+    ... % - 'lim': get limits from the existing lim
+    'lim_from', 'data' % 'data'|'lim' 
     });
 
 if isempty(S.axis_dst), S.axis_dst = S.xy; end
@@ -25,10 +29,20 @@ if ~isscalar(S.ax)
     return;
 end
 
-xy = bml.plot.get_all_xy(S.ax);
-coord = xy(:, lower(S.xy) == 'xy');
-coord = coord(isfinite(coord));
-
+switch S.lim_from
+    case 'data'
+        xy = bml.plot.get_all_xy(S.ax);
+        coord = xy(:, lower(S.xy) == 'xy');
+        coord = coord(isfinite(coord));
+        
+    case 'lim'
+        switch S.xy
+            case 'x'
+                coord = xlim(S.ax);
+            case 'y'
+                coord = ylim(S.ax);
+        end
+end
 max_lim = max(coord);
 min_lim = min(coord);
 range_lim = max_lim - min_lim;
