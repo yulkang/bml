@@ -13,9 +13,10 @@ S = varargin2S(varargin, {
     'ax', gca
     'margin', 0.1
     ... % 'lim_from'
-    ... % - 'points': get limits from the data in the plot
+    ... % - 'data': get limits based on the all coordinates, including error bars'
+    ... % - 'markers': get limits based on markers but not error bars
     ... % - 'lim': get limits from the existing lim
-    'lim_from', 'data' % 'data'|'lim' 
+    'lim_from', 'data' % 'data'|'markers'|'lim' 
     });
 
 if isempty(S.axis_dst), S.axis_dst = S.xy; end
@@ -34,6 +35,10 @@ switch S.lim_from
         xy = bml.plot.get_all_xy(S.ax);
         coord = xy(:, lower(S.xy) == 'xy');
         coord = coord(isfinite(coord));
+        
+    case 'markers'
+        hs = bml.plot.figure2struct(S.ax);
+        coord = cell2vec(get(hs.marker, [upper(S.xy), 'Data']));
         
     case 'lim'
         switch S.xy
