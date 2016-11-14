@@ -48,6 +48,10 @@ switch S.lim_from
                 coord = ylim(S.ax);
         end
 end
+if isempty(coord)
+    % Do nothing
+    return;
+end
 max_lim = max(coord);
 min_lim = min(coord);
 range_lim = max_lim - min_lim;
