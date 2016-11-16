@@ -448,6 +448,8 @@ end
 %% Internal - manipulate str
 methods
     function [desc, pth, ext] = fileparts(S2s, s)
+        % [desc, pth, ext] = fileparts(S2s, s)
+        % desc: cell array of descriptor strings
         if iscell(s)
             [desc, pth, ext] = cellfun(@S2s.fileparts, s, ...
                 'UniformOutput', false);
