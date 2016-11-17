@@ -22,6 +22,14 @@ function [h_line, h_marker] = gradLine(x,y,varargin)
 %     'MarkerFaceColor', 'auto'
 %     'MarkerEdgeColor', 'w'
 %     });
+%
+% EXAMPLE:
+% for ii = 1:100
+%     gradLine(1:3, rand(1,3)/3 + [0, 0.1, 0.2], ...
+%         'colors', [0 0 0; 0 0 0], ...
+%          'edge_args', {'LineWidth', 2, 'EdgeAlpha', 0.2}, ...
+%          'marker_args', {'Marker', 'none'}); 
+% end
 
 % 2015-2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
@@ -74,9 +82,9 @@ end
 
 assert(size(c,2) == 3);
 if size(c,1) == 1
-    c = [linspaceN(0.9+zeros(1,3), c, n); zeros(1,3)];
+    c = [linspaceN(0.9+zeros(1,3), c, n)];
 elseif size(c,1) == 2
-    c = [linspaceN(c(1,:), c(2,:), n); zeros(1,3)];
+    c = [linspaceN(c(1,:), c(2,:), n)];
 else
     assert(size(c,1) == n);
 end
