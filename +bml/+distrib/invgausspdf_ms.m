@@ -20,10 +20,10 @@ elseif robust_dim == 1
 %     
 %     p = diff(pd.cdf(x));
     
-    if any(isnan(p))
+%     if any(isnan(p))
         p = pd.pdf(x);
         p = bsxfun(@rdivide, p, sum(p));
-    end 
+%     end 
 else
     error('Unsupported robust_dim=%s\n', robust_dim);
 end
