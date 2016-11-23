@@ -270,7 +270,7 @@ methods (Static)
         
         desc = S2s.fileparts(files);
         
-        incl = true(n, 1);
+        incl = true(size(files));
         
         if ~isequal(opt.allof, [])
             incl = incl ...
