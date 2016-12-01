@@ -110,12 +110,13 @@ methods
         
         [file, name] = PFile.get_file(add_fields, remove_fields);
     end
-    function [file, name] = get_file(PFile, add_fields, remove_fields)
+    function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
+        if ~exist('subdir', 'var'), subdir = class(PFile); end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile('Data', class(PFile), name);
+        file = fullfile('Data', subdir, name);
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
