@@ -41,6 +41,12 @@ properties
     en_cell = '}';
     sep_cell = ',';
     
+    % replace_pair{k,1} in value is replaced with {k,2} in string,
+    % and vice versa.
+    replace_pair = {
+        '.', '^'
+        };
+    
     skip_fields_with_error = true;
     skip_empty = true;
 end
@@ -402,7 +408,8 @@ methods
                     S2s.en_mat
                     ];
             end
-        end        
+        end
+        str_v = strrep_cell(str_v, S2s.replace_pair);
     end
     function str = struct2str(S2s, S)        
 %         if isequal(S2s.fields, [])
@@ -493,6 +500,7 @@ methods
         end
     end
     function v = str2value(S2s, s)
+        s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
         if isempty(s)
             v = [];
         elseif all(ismember(s, ['-', '.', '0':'9', ',']))
