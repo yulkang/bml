@@ -99,6 +99,9 @@ methods
     end
 end
 %% Files
+properties
+    subdir_ = '';
+end
 methods
     function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -113,10 +116,17 @@ methods
     function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
-        if ~exist('subdir', 'var'), subdir = class(PFile); end
+        if ~exist('subdir', 'var'), subdir = PFile.get_subdir; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
         file = fullfile('Data', subdir, name);
+    end
+    function subdir = get_subdir(PFile)
+        if isempty(PFile.subdir_)
+            subdir = class(PFile);
+        else
+            subdir = PFile.subdir_;
+        end
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
