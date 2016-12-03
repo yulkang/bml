@@ -16,6 +16,7 @@ properties (Access = private)
         };    
     file_mult_ = {
         };
+    file_name_ = '';
 end
 properties (Dependent)
     % file_fields = {
@@ -30,6 +31,8 @@ properties (Dependent)
     
     S0_file
     S_file
+    
+    file_name
 end
 %% Names from multiple files
 methods
@@ -140,15 +143,38 @@ methods
     function set_subdir(PFile, subdir)
         PFile.subdir_ = subdir;
     end
+    function name = get.file_name(PFile)
+        name = PFile.get_file_name;
+    end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
+        S2s = bml.str.Serializer;
+        
+        if ~isempty(PFile.file_name_)
+            name = PFile.file_name_;
+            
+            if ~isequal(add_fields, struct) || ~isempty(remove_fields)
+                S_file = S2s.convert(name);
+                S_file = varargin2S(add_fields, S_file);
+                S_file = rmfield(S_file, remove_fields);
+                name = S2s.convert(S_file);
+            end
+            return;
+        end
+        
         S_file = PFile.get_S_file(add_fields, remove_fields);
-        name = bml.str.Serializer.convert(S_file);
+        name = S2s.convert(S_file);
         
         % Prevent erroneous behavior regarding extensions.
         name = strrep(name, '.', '^'); 
+    end
+    function set.file_name(PFile, name)
+        PFile.set_file_name(name);
+    end
+    function set_file_name(PFile, name)
+        PFile.file_name_ = name;
     end
     function S_file = get.S_file(PFile)
         S_file = PFile.get_S_file;
