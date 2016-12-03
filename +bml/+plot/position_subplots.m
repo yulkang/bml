@@ -25,6 +25,9 @@ S = varargin2S(varargin, {
     'margin', nan(1,4) 
     'btw_row', 0.05 % if vector, btw_row(1) is between rows 1 and 2.
     'btw_col', 0.05 % if vector, btw_col(1) is between columns 1 and 2.
+    ...
+    'col_rel', [] % if nonempty, assigns relative width of each column.
+    'row_rel', [] % if nonempty, assigns relative height of each row.
     });
 n_row = size(ax, 1);
 n_col = size(ax, 2);
@@ -41,20 +44,34 @@ end
 S.btw_row = bml.matrix.rep2fit(S.btw_row(:), [n_row - 1, 1]);
 S.btw_col = bml.matrix.rep2fit(S.btw_col(:), [n_col - 1, 1]);
 
+if isempty(S.col_rel)
+    S.col_rel = ones(1, n_col);
+else
+    assert(numel(S.col_rel) == n_col);
+end
+S.col_rel = S.col_rel ./ sum(S.col_rel);
 
-width = (1 - sum(S.margin([1, 3])) - sum(S.btw_col)) / n_col;
-height = (1 - sum(S.margin([2, 4])) - sum(S.btw_row)) / n_row;
+if isempty(S.row_rel)
+    S.row_rel = ones(1, n_row);
+else
+    assert(numel(S.row_rel) == n_row);
+end
+S.row_rel = S.row_rel ./ sum(S.row_rel);
+
+width = (1 - sum(S.margin([1, 3])) - sum(S.btw_col)) .* S.col_rel;
+height = (1 - sum(S.margin([2, 4])) - sum(S.btw_row)) .* S.row_rel;
 
 for i_row = 1:n_row
     for i_col = 1:n_col
         left = S.margin(1) ...
              + sum(S.btw_col(1:(i_col - 1))) ...
-             + width * (i_col - 1);
+             + sum(width(1:(i_col - 1)));
         bottom = S.margin(2) ...
                + sum(S.btw_row(i_row:(n_row - 1))) ...
-               + height * (n_row - i_row);
+               + sum(height(1:(n_row - i_row)));
         
-        set(ax(i_row, i_col), 'Position', [left, bottom, width, height]);
+        set(ax(i_row, i_col), ...
+            'Position', [left, bottom, width(i_col), height(i_row)]);
     end
 end
 end
