@@ -82,6 +82,13 @@ function [Ss, n] = factorizeC(C, fields, to_fix)
 C = S2C2(C);
 m = size(C,1);
 
+% Handle empty cases
+if isempty(C)
+    Ss = struct;
+    n = 1;
+    return;
+end
+
 if nargin < 2
     fields = C(:,1);
 elseif ~iscell(fields)
