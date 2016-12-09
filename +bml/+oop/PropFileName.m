@@ -245,8 +245,8 @@ methods
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
-    function [ax, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
-        % [ax, files] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+    function [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
+        % [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, ...)
         %
         % INPUT:
         % row_args, col_args, page_args
@@ -306,9 +306,9 @@ methods
             ... % if true, gives full title to each subplot
             ... % if false, gives row/column/page title
             'title_subplot', false
-            'to_gltitle', true
+            'to_gltitle', false
             ...
-            'savefigs', true
+            'savefigs', false
             'savefigs_args', {}
             });
         
@@ -327,6 +327,7 @@ methods
         files = cell(n_page, 1);
         
         S2s = bml.str.Serializer;
+        h = struct;
         
         for page = 1:n_page
             clf;            
@@ -370,12 +371,12 @@ methods
                 end
             end
             
-            if ~opt.title_subplot
+            if ~opt.title_subplot && opt.to_gltitle
                 f_title = @(s) strrep(s, '_', '-');
                 
-                gltitle(ax, 'row', f_title(titles_row));
-                gltitle(ax, 'col', f_title(titles_col));
-                gltitle(ax, 'all', bml.str.wrap_text( ...
+                h.title_row = gltitle(ax, 'row', f_title(titles_row));
+                h.title_col = gltitle(ax, 'col', f_title(titles_col));
+                h.title_all = gltitle(ax, 'all', bml.str.wrap_text( ...
                     f_title(titles_page{page})));
             end
             
