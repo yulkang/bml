@@ -79,6 +79,12 @@ function [Ss, n] = factorizeC(C, fields, to_fix)
 
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
+if isempty(C)
+    Ss = struct;
+    n = 1;
+    return;
+end
+
 C = S2C2(C);
 m = size(C,1);
 

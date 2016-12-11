@@ -28,6 +28,6 @@ function [p_max, p_last] = max_distrib(d, nrm)
 
 if nargin < 2, nrm = 'prod'; end
 
-[p_max, p_last] = bml.stat.min_distrib(flip(d, 1), nrm);
+[p_max, p_last] = min_distrib(flip(d, 1), nrm);
 p_max = flip(p_max, 1);
 p_last = flip(p_last, 1);

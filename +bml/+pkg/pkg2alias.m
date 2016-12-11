@@ -99,7 +99,7 @@ if S.move_class
                     'builtin', 'pfile', 'dir', 'class'};
         if S.confirm || kind ~= 0
             if kind ~= 0
-                warning('%s already exists as a %s at %s\n', ...
+                warning('%s already exists as a %s at %s\n\n', ...
                     name, ...
                     kind_str{kind}, ...
                     which(name));
@@ -119,7 +119,7 @@ if S.move_class
         if exist_dst_dir
             % If the destination class directory exists already, 
             % there's something wrong.
-            error('Both %s and %s exist already!\n', classdir_full, dst);
+            error('Both %s and %s exist already!\n\n', classdir_full, dst);
     %         skipped = [skipped; {classdir_full}]; %#ok<AGROW>
     %         
     %         % Should not make a new alias
@@ -129,7 +129,7 @@ if S.move_class
             movefile(classdir_full, dst);
             moved = [moved; {classdir_full}]; %#ok<AGROW>
             if S.verbose
-                fprintf('Moved %s to %s.\n', classdir_full, dst);
+                fprintf('Moved\n  %s\nto\n  %s.\n\n', classdir_full, dst);
             end
         end
 
@@ -172,7 +172,7 @@ for ii = 1:n
         mfile0 = mfile;
         mfile = which(mfile0);
         if isempty(mfile)
-            error('%s does not exist!\n', mfile0);
+            error('%s does not exist!\n\n', mfile0);
         end
     end
     
@@ -190,7 +190,7 @@ for ii = 1:n
                 'builtin', 'pfile', 'dir', 'class'};
     if S.confirm || ((kind ~= 0) && (S.confirm >= 2))
         if kind ~= 0
-            warning('%s already exists as a %s at %s\n', ...
+            warning('Already exists:\n  %s\nas \n  %s\nat \n  %s\n\n', ...
                 name, ...
                 kind_str{kind}, ...
                 which(name));
@@ -216,7 +216,9 @@ for ii = 1:n
         to_skip = true;
     else
         if S.confirm
-            if ~inputYN_def(sprintf('Move %s to %s\n', mfile, dst), true)
+            if ~inputYN_def( ...
+                    sprintf('Move\n  %s\nto\n  %s\n\n', mfile, dst), ...
+                    true)
                 to_skip = true;
             end
         end
@@ -233,7 +235,7 @@ for ii = 1:n
         movefile(mfile, dst);
         moved = [moved; {mfile}]; %#ok<AGROW>
         if S.verbose
-            fprintf('Moved %s to %s.\n', mfile, dst);
+            fprintf('Moved\n  %s\nto\n  %s.\n\n', mfile, dst);
         end
     end
     
@@ -252,9 +254,9 @@ for ii = 1:n
         bml.pkg.make_alias_in_pkg(dst, pkg, C{:});
         
         if ~exist_dst
-            fprintf('Alias in %s.%s created.\n', pkg, dst);
+            fprintf('Alias created in\n  %s.%s\n\n', pkg, dst);
         else
-            fprintf('Alias in %s.%s updated.\n', pkg, name);
+            fprintf('Alias updated in\n  %s.%s\n\n', pkg, name);
         end
     end
 end
