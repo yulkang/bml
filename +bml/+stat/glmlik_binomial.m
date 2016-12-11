@@ -24,3 +24,7 @@ loglik = 0;
 for cond = 1:n_cond
     loglik = loglik - bml.stat.nll_bin(y_pred(cond, :), y_binned(cond, :));
 end
+
+% plot(y_binned(:,2) ./ sum(y_binned,2), 'o'); hold on;
+% plot(y_pred(:,2) ./ sum(y_pred,2), '-'); hold off;
+% disp(loglik);
