@@ -41,6 +41,12 @@ properties
     en_cell = '}';
     sep_cell = ',';
     
+    % replace_pair{k,1} in value is replaced with {k,2} in string,
+    % and vice versa.
+    replace_pair = {
+        '.', '^'
+        };
+    
     skip_fields_with_error = true;
     skip_empty = true;
 end
@@ -217,6 +223,8 @@ methods (Static)
     function [files, desc, info] = ls(filt, varargin)
         % [files, desc, info] = ls(filt, varargin)
         %
+        % filt: filter string or a cell array of file paths.
+        %
         % OPTIONS
         % -------
         % 'allof', []
@@ -241,6 +249,7 @@ methods (Static)
             'props', {} % properties of Serializer
             'fullpath', true
             });
+        is_filt_list = iscell(filt);
 
         S2s = bml.str.Serializer(opt.props{:});
         
@@ -257,13 +266,17 @@ methods (Static)
             opt.(f{1}) = v;
         end
         
-        info = vVec(dir(filt));
-        files = vVec({info.name});
+        if ~is_filt_list
+            info = vVec(dir(filt));
+            files = vVec({info.name});
+        else
+            files = filt;
+        end
         n = numel(files);
         
         desc = S2s.fileparts(files);
         
-        incl = true(n, 1);
+        incl = true(size(files));
         
         if ~isequal(opt.allof, [])
             incl = incl ...
@@ -288,9 +301,11 @@ methods (Static)
         
         files = files(incl);
         desc = desc(incl);
-        info = info(incl);
+        if ~is_filt_list
+            info = info(incl);
+        end
         
-        if opt.fullpath
+        if opt.fullpath && ~is_filt_list
             pth = bml.file.filt2dir(filt);
             files = fullfile(pth, files);
         end
@@ -393,7 +408,8 @@ methods
                     S2s.en_mat
                     ];
             end
-        end        
+        end
+        str_v = strrep_cell(str_v, S2s.replace_pair);
     end
     function str = struct2str(S2s, S)        
 %         if isequal(S2s.fields, [])
@@ -439,6 +455,8 @@ end
 %% Internal - manipulate str
 methods
     function [desc, pth, ext] = fileparts(S2s, s)
+        % [desc, pth, ext] = fileparts(S2s, s)
+        % desc: cell array of descriptor strings
         if iscell(s)
             [desc, pth, ext] = cellfun(@S2s.fileparts, s, ...
                 'UniformOutput', false);
@@ -482,6 +500,7 @@ methods
         end
     end
     function v = str2value(S2s, s)
+        s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
         if isempty(s)
             v = [];
         elseif all(ismember(s, ['-', '.', '0':'9', ',']))

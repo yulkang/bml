@@ -16,6 +16,7 @@ properties (Access = private)
         };    
     file_mult_ = {
         };
+    file_name_ = '';
 end
 properties (Dependent)
     % file_fields = {
@@ -27,6 +28,11 @@ properties (Dependent)
     % file_mult = {
     %   'prop_name', multiply_from_prop2filename
     file_mult
+    
+    S0_file
+    S_file
+    
+    file_name
 end
 %% Names from multiple files
 methods
@@ -96,6 +102,12 @@ methods
     end
 end
 %% Files
+properties
+    subdir_ = '';
+end
+properties (Dependent)
+    subdir
+end
 methods
     function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -107,22 +119,65 @@ methods
         
         [file, name] = PFile.get_file(add_fields, remove_fields);
     end
-    function [file, name] = get_file(PFile, add_fields, remove_fields)
+    function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
+        if ~exist('subdir', 'var'), subdir = PFile.subdir; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile('Data', class(PFile), name);
+        file = fullfile('Data', subdir, name);
+    end
+    function subdir = get.subdir(PFile)
+        subdir = PFile.get_subdir;
+    end
+    function subdir = get_subdir(PFile)
+        if isempty(PFile.subdir_)
+            subdir = class(PFile);
+        else
+            subdir = PFile.subdir_;
+        end
+    end
+    function set.subdir(PFile, subdir)
+        PFile.set_subdir(subdir);
+    end
+    function set_subdir(PFile, subdir)
+        PFile.subdir_ = subdir;
+    end
+    function name = get.file_name(PFile)
+        name = PFile.get_file_name;
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
+        S2s = bml.str.Serializer;
+        
+        if ~isempty(PFile.file_name_)
+            name = PFile.file_name_;
+            
+            if ~isequal(add_fields, struct) || ~isempty(remove_fields)
+                S_file = S2s.convert(name);
+                S_file = varargin2S(add_fields, S_file);
+                S_file = rmfield(S_file, remove_fields);
+                name = S2s.convert(S_file);
+            end
+            return;
+        end
+        
         S_file = PFile.get_S_file(add_fields, remove_fields);
-        name = bml.str.Serializer.convert(S_file);
+        name = S2s.convert(S_file);
         
         % Prevent erroneous behavior regarding extensions.
         name = strrep(name, '.', '^'); 
+    end
+    function set.file_name(PFile, name)
+        PFile.set_file_name(name);
+    end
+    function set_file_name(PFile, name)
+        PFile.file_name_ = name;
+    end
+    function S_file = get.S_file(PFile)
+        S_file = PFile.get_S_file;
     end
     function [S_file, S0_file] = get_S_file(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -138,7 +193,6 @@ methods
 %         end
 
         S0_file = PFile.get_S0_file;
-        
         
         if isempty(file_fields)
             S_file = struct;
@@ -162,6 +216,9 @@ methods
         end
         
         S_file = varargin2S(add_fields, S_file);
+    end
+    function S0_file = get.S0_file(PFile)
+        S0_file = PFile.get_S0_file;
     end
     function S0_file = get_S0_file(PFile)
         C = PFile.get_file_fields;
@@ -287,12 +344,15 @@ methods
         % the row over column over page.
         %
         % OUTPUT:
-        % ax(row, col)
+        % axs{page}(row, col)
         % : handle of the subplot.
         %   When there are multiple pages, only the last page is kept.
         %
         % files{page}
         % : file to save the page.
+        %
+        % titles{page}
+        % : struct containing page, row, and column titles
         %
         % OPTIONS:
         % ... % 'title_subplot'
@@ -302,6 +362,8 @@ methods
         % ...
         % 'savefigs', true
         % 'savefigs_args', {}
+        % ...
+        % 'to_clf', true % Set false to retrieve ax of multiple pages
         %
         % EXAMPLE:
         % imgather(W0, {
@@ -323,6 +385,26 @@ methods
         if nargin < 3, col_args = {}; end
         if nargin < 4, page_args = {}; end
         if nargin < 5, add_args = {}; end
+
+        [Ss_page, n_page] = factorizeC(page_args);
+        Ss_page_file = W0.convert_to_S_file(Ss_page);
+        
+        axs = cell(n_page, 1);
+        files = cell(n_page, 1);
+        titles = cell(n_page, 1);
+        for page = 1:n_page
+            page_args = varargin2C(Ss_page_file(page));
+            
+            [axs{page}, files{page}, titles{page}] = ...
+                W0.imgather_page(row_args, col_args, page_args, add_args, ...
+                    varargin{:});
+        end
+    end
+    function [ax, file, titles] = imgather_page(W0, row_args, col_args, page_args, add_args, varargin)
+        if nargin < 2, row_args = {}; end
+        if nargin < 3, col_args = {}; end
+        if nargin < 4, page_args = {}; end
+        if nargin < 5, add_args = {}; end
         
         opt = varargin2S(varargin, {
             'clear_title', true % Clear existing title.
@@ -335,69 +417,73 @@ methods
             ...
             'savefigs', false
             'savefigs_args', {}
-            });
+            ...
+            'to_clf', true % Set false to retrieve ax of multiple pages
+            });        
         
         [Ss_row, n_row] = factorizeC(row_args);
         [Ss_col, n_col] = factorizeC(col_args);
-        [Ss_page, n_page] = factorizeC(page_args);
+        S_page = varargin2S(page_args);
         
         Ss_row_file = W0.convert_to_S_file(Ss_row);
         Ss_col_file = W0.convert_to_S_file(Ss_col);
-        Ss_page_file = W0.convert_to_S_file(Ss_page);
+        
+        % A single page
+        S_page_file = W0.convert_to_S_file(S_page);
         
         ax = ghandles(n_row, n_col);
         titles.row = cell(n_row, 1);
         titles.col = cell(n_col, 1);
-        titles.page = cell(n_page, 1);
-        files = cell(n_page, 1);
+        titles.page = '';
         
         S2s = bml.str.Serializer;
         h = struct;
         
-        for page = 1:n_page
+        if opt.to_clf
             clf;            
-            for row = 1:n_row
-                for col = 1:n_col
-                    ax1 = subplotRC(n_row, n_col, row, col);
-                    
-                    % row overrides col overrides page.
-                    S_row = Ss_row(row);
-                    S_col = Ss_col(col);
-                    S_page = Ss_page(page);
-                    
-                    S_row_file = Ss_row_file(row);
-                    S_col_file = Ss_col_file(col);
-                    S_page_file = Ss_page_file(page);
-                    
-                    titles.row{row} = S2s.convert(S_row_file);
-                    titles.col{col} = S2s.convert(S_col_file);
-                    titles.page{page} = S2s.convert(S_page_file);
-                    
-                    W = feval(class(W0));
-                    S = varargin2S( ...
-                            varargin2S( ...
-                                S_row, ...
-                                S_col), ...
-                            S_page);
-                    C = S2C(S);
+        else
+            figure;
+        end
+        for row = 1:n_row
+            for col = 1:n_col
+                ax1 = subplotRC(n_row, n_col, row, col);
 
-                    W = varargin2fields(W, C);
-                    
-                    C1 = W0.convert_to_S_file(S);
-                    file_args = varargin2C(C1, add_args);
-                    file = [W.get_file(file_args), '.fig'];
-                    
-                    ax1 = openfig_to_axes(file, ax1);
-                    
-                    if opt.clear_title
-                        title(ax1, '');
-                    end
-                    if opt.title_subplot
-                        title(W.get_title(C));
-                    end
-                        
-                    ax(row,col) = ax1;
+                % row overrides col overrides page.
+                S_row = Ss_row(row);
+                S_col = Ss_col(col);
+
+                S_row_file = Ss_row_file(row);
+                S_col_file = Ss_col_file(col);
+
+                titles.row{row} = S2s.convert(S_row_file);
+                titles.col{col} = S2s.convert(S_col_file);
+                titles.page = S2s.convert(S_page_file);
+
+                W = feval(class(W0));
+                S = varargin2S( ...
+                        varargin2S( ...
+                            S_row, ...
+                            S_col), ...
+                        S_page);
+                C = S2C(S);
+
+                W = varargin2fields(W, C);
+
+                C1 = W0.convert_to_S_file(S);
+                file_args = varargin2C(C1, add_args);
+                file = [W.get_file(file_args), '.fig'];
+
+                ax1 = openfig_to_axes(file, ax1);
+
+                if opt.clear_title
+                    title(ax1, '');
                 end
+                if opt.title_subplot
+                    title(W.get_title(C));
+                end
+
+                ax(row,col) = ax1;
+            end
             end
             
             if ~opt.title_subplot && opt.to_gltitle

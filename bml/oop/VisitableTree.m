@@ -161,6 +161,12 @@ classdef VisitableTree < DeepCopyable
             child = Tree.parse_child(child_or_name);
             child.remove_parent;
         end
+        function remove_all_children(Tree)
+            children = Tree.get_children;
+            for child = children(:)'
+                Tree.remove_child(child{1});
+            end
+        end
         function set_parent(Tree, parent)
             % Set parent and and update descendents' root.
             % set_parent(Tree, parent)

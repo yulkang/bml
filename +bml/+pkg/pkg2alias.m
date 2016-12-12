@@ -9,7 +9,7 @@ function [conflicts, moved, skipped] = pkg2alias(src, varargin)
 % skipped cell array of original .m files/class folders that are skipped.
 %
 % OPTIONS:
-% 'root', pwd
+% 'root', 'lib/BetterMatLab'
 % 
 % % If true, ask if to use the original name, to rename, or to skip.
 % % Even if false, confirms if the name conflicts with names on path.

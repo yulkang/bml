@@ -31,6 +31,11 @@ fix_max = nan;
 varargin2V(varargin);
 
 % Input preprocessing
+if ~exist('y', 'var')
+    y = bml.plot.get_all_xy;
+    y = y(:,2);
+end
+
 y = y(:)';
 
 if exist('e', 'var')

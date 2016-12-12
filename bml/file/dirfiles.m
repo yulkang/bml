@@ -1,4 +1,4 @@
-function [f, n] = dirfiles(d)
+function [files, nam] = dirfiles(d)
 % Full path to files (not folders) within the given folder.
 %
 % [F, N] = dirfiles(D)
@@ -13,6 +13,6 @@ if ~exist(d, 'dir')
     % extract path part
     d = fileparts(d);
 end
-n    = {info.name};
-n    = n(~[info.isdir] & ~strcmps({'.DS_Store'}, n));
-f    = fullfile(d, n(:));
+nam    = {info.name};
+nam    = nam(~[info.isdir] & ~strcmps({'.DS_Store'}, nam));
+files  = fullfile(d, nam(:));

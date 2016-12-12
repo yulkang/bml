@@ -13,6 +13,7 @@ function beautify_tick(ax, xy, varargin)
 %     }
 S = varargin2S(varargin, {
     'tick', { % Candidate sets of ticks in progressively smaller steps.
+        0:1:5
         0:0.5:5
         0:0.2:5
         0:0.1:5

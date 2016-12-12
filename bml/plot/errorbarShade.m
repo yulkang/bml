@@ -14,7 +14,7 @@ function [hLine, hPatch] = errorbarShade(x, y, e, spec, alpha, specLine, specPat
 %
 % 2013 (c) Yul Kang. hk2699 at columbia dot edu.
 
-if ~exist('alpha', 'var') || isempty(alpha), alpha = 0.5; end
+if ~exist('alpha', 'var') || isempty(alpha), alpha = 0.25; end
 if ~exist('spec', 'var') || isempty(spec), spec  = 'k-'; end
 if ~exist('specLine', 'var'), specLine = {}; end
 if ~exist('specPatch', 'var'), specPatch = {}; end

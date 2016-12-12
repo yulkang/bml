@@ -13,11 +13,11 @@ function cl = get_class_rel(obj, suffix, varargin)
 % 'add_period', true 
 %
 % EXAMPLE:
-% >> cl = bml.pkg.get_class_rel(Fit.D2.RT.Bounded.Main, 'Plot')
+% >> cl = bml.pkg.get_class_rel(Fit.D2.Bounded.Main, 'Plot')
 % cl =
-% Fit.D2.RT.Bounded.Plot
+% Fit.D2.Bounded.Plot
 %
-% >> cl = bml.pkg.get_class_rel(Fit.D2.RT.Bounded.Main, 'Plot', 'rel_level', -2)
+% >> cl = bml.pkg.get_class_rel(Fit.D2.Bounded.Main, 'Plot', 'rel_level', -2)
 % % Removes two words from the last: 'Bounded.Main', then adds
 % cl =
 % Fit.D2.RT.Plot
