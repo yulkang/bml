@@ -484,7 +484,6 @@ methods
 
                 ax(row,col) = ax1;
             end
-            end
             
             if ~opt.title_subplot && opt.to_gltitle
                 f_title = @(s) strrep(s, '_', '-');
