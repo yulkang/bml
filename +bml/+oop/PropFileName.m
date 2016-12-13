@@ -327,8 +327,8 @@ methods
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
-    function [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
-        % [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+    function [axs, files, h] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
+        % [axs, files, h] = imgather(W0, row_args, col_args, page_args, add_args, ...)
         %
         % INPUT:
         % row_args, col_args, page_args
