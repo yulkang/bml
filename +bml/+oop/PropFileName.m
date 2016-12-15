@@ -31,6 +31,9 @@ properties (Dependent)
     S0_file
     S_file
 end
+properties
+    root_data_dir = 'Data';
+end
 %% Names from multiple files
 methods
     function [files, names, S_files, S0_files] = get_files_from_S0s(PFile0, ...
@@ -115,7 +118,7 @@ methods
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile('Data', class(PFile), name);
+        file = fullfile(PFile.root_data_dir, class(PFile), name);
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -242,7 +245,7 @@ methods
         S0_files = varargin2S(S.add_fields, S0_files);
         S_files = varargin2S(S.add_fields, PFile.convert_to_S_file(S0_files));
         
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_files));
     end
 end
@@ -264,7 +267,7 @@ methods
             'hide_error', true);
         S_file = PFile.convert_to_S_file(S0_file, ...
             'file_fields', file_fields);
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_file));
     end
 end
@@ -453,7 +456,7 @@ methods
                 'add', {add_args}
                 });
             name = S2s.convert(S_file);
-            file = fullfile('Data', class(W), name);
+            file = fullfile(PFile.root_data_dir, class(W), name);
             savefigs(file, opt.savefigs_args{:});
         end
     end
