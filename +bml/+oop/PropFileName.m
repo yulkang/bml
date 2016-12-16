@@ -16,6 +16,8 @@ properties (Access = private)
         };    
     file_mult_ = {
         };
+    
+    S0_file_ = struct; % Fields in addition to properties
 end
 properties (Dependent)
     % file_fields = {
@@ -175,12 +177,22 @@ methods
         S0_file = PFile.get_S0_file;
     end
     function S0_file = get_S0_file(PFile)
-        C = PFile.get_file_fields;
-        if isempty(C)
-            S0_file = struct;
-        else
-            S0_file = copyprops(struct, PFile, 'props', C(:,1));
+        S0_file = struct;
+        fs = PFile.get_file_fields;
+        
+        n = size(fs, 1);
+        S0_file_ = PFile.S0_file_;
+        for ii = 1:n
+            fs1 = fs{ii,1};
+            if isprop(PFile, fs1)
+                S0_file.(fs1) = PFile.(fs1);
+            elseif isfield(S0_file_, fs1)
+                S0_file.(fs1) = S0_file_.(fs1);
+            else
+                % Skip.
+            end
         end
+%         S0_file = copyprops(struct, PFile, 'props', fs(:,1));
     end
     function S0_file = convert_from_S_file(PFile, S_file)
         % TODO: Make consistent with get_S_file regarding cc and cmat
@@ -461,13 +473,100 @@ methods
         end
     end
 end
+%% Add fields that are not properties
+methods
+    function add_file_fields(W, name_orig, name_short, value)
+        % add_file_fields(W, name_orig, name_short, value)
+        % add_file_fields(W, {name_orig1, name_short1, value1; ...})
+        % 
+        % Give an empty name_short to keep name_orig as is in file names.
+        %
+        % This method is not named set_file_fields, 
+        % becasue it does not replace file_fields with the given ones.
+        
+        if iscell(name_orig)
+            % {name_orig1, name_short1, value1; ...}
+            assert(size(name_orig, 2) == 3);
+            n = size(name_orig, 1);
+            for ii = 1:n
+                W.add_file_fields(name_orig{ii,:});
+            end
+            return;
+        else
+            assert(ischar(name_orig));
+            assert(ischar(name_short) || isempty(name_short));
+        end
+        
+        fs = W.file_fields;
+        [~, locb] = ismember(name_orig, fs(:,1));
+        
+        if locb == 0
+            % Then add to file_fields_, the one not specified directly
+            % by get_file_fields
+            fs_ = W.file_fields_;
+            n1 = size(fs_, 1) + 1;
+            W.file_fields_(n1, 1) = name_orig;
+            W.file_fields_(n1, 2) = name_short;
+        end
+
+        % Assign value if given
+        if nargin >= 4
+            if isprop(W, name_orig)
+                W.(name_orig) = value;
+            else
+                W.S0_file_.(name_orig) = value;
+            end
+        end
+    end
+    function copy_file_fields(W, src, file_fields)
+        % copy_file_fields(W, src, file_fields)
+        %
+        % src: struct or object
+        % file_fields: {name_orig1, name_short1; ...}
+        
+        assert(iscell(file_fields));
+        assert(size(file_fields, 2) == 2);
+        fs = file_fields(:,1);
+        n = size(fs, 1);
+        for ii = 1:n
+            W.add_file_fields( ...
+                file_fields{ii,1}, file_fields{ii,2}, ...
+                src.(file_fields{ii,1}));
+        end
+    end
+end
 %% Properties
 methods
     function v = get.file_fields(W)
-        v = W.get_file_fields;
+        v = W.get_file_fields_merged_;
     end
+    function fs = get_file_fields_merged_(W)
+        fs0 = W.get_file_fields;
+        fs_ = W.file_fields_;
+        
+        % When there are overlapping fields in fs and fs_, 
+        % fs, the one returned by get_file_fields, is prioritized.
+        [~, ia] = setdiff(fs_, fs0);
+        
+        fs = [fs0; fs_(ia, :)];
+    end
+    function v = get_file_fields(~)
+        v = {};
+    end
+    
     function set.file_fields(W, v)
         W.set_file_fields(v);
+    end
+    function set_file_fields(W, v)
+        % set_file_fields(W, file_fields)
+        %
+        % USAGE:
+        % file_fields = {name_orig1, name_short1; ...}
+        % file_fields = {name_orig1, name_short1, value1; ...}
+        n = size(v, 1);
+        for ii = 1:n
+            W.add_file_fields(v{ii,:});
+        end
     end
 
     function v = get.file_mult(W)
@@ -475,13 +574,6 @@ methods
     end
     function set.file_mult(W, v)
         W.set_file_mult(v);
-    end
-
-    function v = get_file_fields(W)
-        v = W.file_fields_;
-    end
-    function set_file_fields(W, v)
-        W.file_fields_ = v;
     end
 
     function v = get_file_mult(W)
