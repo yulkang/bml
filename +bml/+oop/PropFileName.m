@@ -11,7 +11,7 @@ classdef PropFileName < matlab.mixin.Copyable
 %   'prop_name', multiply_from_prop2filename
 %
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
-properties (Access = private)
+properties % (Access = private)
     file_fields_ = {
         };    
     file_mult_ = {
@@ -178,7 +178,7 @@ methods
     end
     function S0_file = get_S0_file(PFile)
         S0_file = struct;
-        fs = PFile.get_file_fields;
+        fs = PFile.file_fields;
         
         n = size(fs, 1);
         S0_file_ = PFile.S0_file_;
@@ -511,13 +511,15 @@ methods
 
         % Assign value if given
         if nargin >= 4
-            try
-%             if isprop(W, name_orig)
-%                 if ~isequal(W.(name_orig), value)
-                    W.(name_orig) = value;
-%                 end
-%             else
-            catch err % just set it, but it will be ignored...
+            if isprop(W, name_orig)
+                if ~isequal(W.(name_orig), value)
+                    try
+                        varargin2props(W, {name_orig, value});
+                    catch err
+                        warning(err_msg(err));
+                    end
+                end
+            else
                 W.S0_file_.(name_orig) = value;
             end
         end
@@ -557,10 +559,11 @@ methods
         end
         fs = file_fields(:,1);
         n = size(fs, 1);
+        S0_file = src.S0_file;
         for ii = 1:n
             W.add_file_fields( ...
                 file_fields{ii,1}, file_fields{ii,2}, ...
-                src.(file_fields{ii,1}));
+                S0_file.(file_fields{ii,1}));
         end
     end
 end
