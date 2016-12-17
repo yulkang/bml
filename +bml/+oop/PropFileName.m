@@ -505,27 +505,56 @@ methods
             % by get_file_fields
             fs_ = W.file_fields_;
             n1 = size(fs_, 1) + 1;
-            W.file_fields_(n1, 1) = name_orig;
-            W.file_fields_(n1, 2) = name_short;
+            W.file_fields_{n1, 1} = name_orig;
+            W.file_fields_{n1, 2} = name_short;
         end
 
         % Assign value if given
         if nargin >= 4
-            if isprop(W, name_orig)
-                W.(name_orig) = value;
-            else
+            try
+%             if isprop(W, name_orig)
+%                 if ~isequal(W.(name_orig), value)
+                    W.(name_orig) = value;
+%                 end
+%             else
+            catch err % just set it, but it will be ignored...
                 W.S0_file_.(name_orig) = value;
             end
         end
     end
     function copy_file_fields(W, src, file_fields)
+        % USAGE:
+        % copy_file_fields(W, PFile_src)
+        % copy_file_fields(W, PFile_src, {name_orig1; name_orig2; ...})
         % copy_file_fields(W, src, file_fields)
-        %
-        % src: struct or object
-        % file_fields: {name_orig1, name_short1; ...}
+        % - src: struct or object
+        % - file_fields: {name_orig1, name_short1; ...}
         
-        assert(iscell(file_fields));
-        assert(size(file_fields, 2) == 2);
+        if nargin < 3
+            assert((isstruct(src) && isfield(src, 'file_fields')) ...
+                || isprop(src, 'file_fields'));
+            file_fields = src.file_fields;
+        else
+            assert(iscell(file_fields));
+            
+            if size(file_fields, 2) == 1
+                assert((isstruct(src) && isfield(src, 'file_fields')) ...
+                    || isprop(src, 'file_fields'));
+                file_fields0 = src.file_fields;
+                if isempty(file_fields0)
+                    file_fields = cell(0,2);
+                else
+                    [~,~,ib] = intersect( ...
+                        file_fields(:,1), ...
+                        file_fields0(:,1), ...
+                        'stable'); % Follows the order of file_fields
+                    
+                    file_fields = file_fields0(ib,:);
+                end
+            else
+                assert(size(file_fields, 2) == 2);
+            end
+        end
         fs = file_fields(:,1);
         n = size(fs, 1);
         for ii = 1:n
@@ -544,14 +573,19 @@ methods
         fs0 = W.get_file_fields;
         fs_ = W.file_fields_;
         
-        % When there are overlapping fields in fs and fs_, 
-        % fs, the one returned by get_file_fields, is prioritized.
-        [~, ia] = setdiff(fs_, fs0);
-        
-        fs = [fs0; fs_(ia, :)];
+        if isempty(fs_)
+            % Nothing to add to fs0
+            fs = fs0;
+        else
+            % When there are overlapping fields in fs and fs_, 
+            % fs, the one returned by get_file_fields, is prioritized.
+            [~, ia] = setdiff(fs_(:,1), fs0(:,1), 'stable');
+
+            fs = [fs0; fs_(ia, :)];
+        end
     end
     function v = get_file_fields(~)
-        v = {};
+        v = cell(0,2);
     end
     
     function set.file_fields(W, v)
