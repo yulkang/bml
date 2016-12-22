@@ -42,6 +42,10 @@ switch S.type
             axis_lim = max(abs(all_val));
             axis_lim = [-axis_lim, axis_lim] .* (1 + S.margin);
         end
+        if axis_lim(1) == axis_lim(2)
+            axis_lim(1) = axis_lim(1) - eps;
+            axis_lim(2) = axis_lim(2) + eps;
+        end
         
     otherwise
         error('type=%s not supported yet!\n', S.type);
