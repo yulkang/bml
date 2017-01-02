@@ -34,6 +34,9 @@ properties (Dependent)
     
     file_name
 end
+properties
+    root_data_dir = 'Data';
+end
 %% Names from multiple files
 methods
     function [files, names, S_files, S0_files] = get_files_from_S0s(PFile0, ...
@@ -125,26 +128,7 @@ methods
         if ~exist('subdir', 'var'), subdir = PFile.subdir; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile('Data', subdir, name);
-    end
-    function subdir = get.subdir(PFile)
-        subdir = PFile.get_subdir;
-    end
-    function subdir = get_subdir(PFile)
-        if isempty(PFile.subdir_)
-            subdir = class(PFile);
-        else
-            subdir = PFile.subdir_;
-        end
-    end
-    function set.subdir(PFile, subdir)
-        PFile.set_subdir(subdir);
-    end
-    function set_subdir(PFile, subdir)
-        PFile.subdir_ = subdir;
-    end
-    function name = get.file_name(PFile)
-        name = PFile.get_file_name;
+        file = fullfile(PFile.root_data_dir, class(PFile), name);
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -291,7 +275,7 @@ methods
         S0_files = varargin2S(S.add_fields, S0_files);
         S_files = varargin2S(S.add_fields, PFile.convert_to_S_file(S0_files));
         
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_files));
     end
 end
@@ -313,7 +297,7 @@ methods
             'hide_error', true);
         S_file = PFile.convert_to_S_file(S0_file, ...
             'file_fields', file_fields);
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_file));
     end
 end
@@ -437,7 +421,6 @@ methods
         titles.page = '';
         
         S2s = bml.str.Serializer;
-        h = struct;
         
         if opt.to_clf
             clf;            
@@ -484,29 +467,27 @@ methods
 
                 ax(row,col) = ax1;
             end
-            
-            if ~opt.title_subplot && opt.to_gltitle
-                f_title = @(s) strrep(s, '_', '-');
-                
-                h.title_row = gltitle(ax, 'row', f_title(titles_row));
-                h.title_col = gltitle(ax, 'col', f_title(titles_col));
-                h.title_all = gltitle(ax, 'all', bml.str.wrap_text( ...
-                    f_title(titles_page{page})));
-            end
-            
-            if opt.savefigs
-                S_file = varargin2S({
-                    'page', {S_page_file}
-                    'row', {S2s.Ss2s(Ss_row_file)}
-                    'col', {S2s.Ss2s(Ss_col_file)}
-                    'add', {add_args}
-                    });
-                name = S2s.convert(S_file);
-                file = fullfile('Data', class(W), name);
-                savefigs(file, opt.savefigs_args{:});
-                
-                files{page} = file;
-            end
+        end
+
+        if ~opt.title_subplot && opt.to_gltitle
+            f_title = @(s) strrep(s, '_', '-');
+
+            gltitle(ax, 'row', f_title(titles.row));
+            gltitle(ax, 'col', f_title(titles.col));
+            gltitle(ax, 'all', bml.str.wrap_text( ...
+                f_title(titles.page{page})));
+        end
+
+        if opt.savefigs
+            S_file = varargin2S({
+                'page', {S_page_file}
+                'row', {S2s.Ss2s(Ss_row_file)}
+                'col', {S2s.Ss2s(Ss_col_file)}
+                'add', {add_args}
+                });
+            name = S2s.convert(S_file);
+            file = fullfile(PFile.root_data_dir, class(W), name);
+            savefigs(file, opt.savefigs_args{:});
         end
     end
 end

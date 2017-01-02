@@ -63,7 +63,7 @@ else
 end
 
 %% Correct
-if IsWin
+if exist('IsWin', 'file') && IsWin
     xywh(2) = xywh(2) - 50;
 end
 
