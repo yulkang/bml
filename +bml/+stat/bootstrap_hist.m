@@ -17,21 +17,26 @@ end
 
 cum_hst0 = cumsum(hst0);
 n0 = cum_hst0(end,:);
-ix0 = zeros(size(hst0));
+
 n_cond = size(hst0, 2);
+n_bin = size(hst0, 1);
+
+samp0 = cell(1, n_cond);
+w0 = cell(1, n_cond);
+n_nonzero = zeros(1, n_cond);
 
 for i_cond = 1:n_cond
-    cum_hst1 = cum_hst0(:,i_cond);
-    for i0 = 1:n0
-        ix0(i0, i_cond) = find(cum_hst1 >= i0, 1, 'first');
-    end
+    samp0{i_cond} = find(hst0(:,i_cond));
+    w0{i_cond} = hst0(samp0{i_cond}, i_cond);
+    n_nonzero(i_cond) = numel(samp0{i_cond});
 end
 
 hst = cell(S.n_boot, 1);
 for i_boot = 1:S.n_boot
     for i_cond = n_cond:-1:1
-        n1 = n0(i_cond);
-        ix1 = max(ceil(rand(n1, 1) * n1), 1);
-        hst1(:,i_cond) = ix0(ix1, i_cond)
+        bin1 = randsample(n_nonzero(i_cond), n0(i_cond), true, w0{i_cond});
+        bin1 = samp0{i_cond}(bin1);
+        hst1(:,i_cond) = accumarray(bin1, 1, [n_bin, 1], @sum);
     end
+    hst{i_boot} = hst1;
 end
