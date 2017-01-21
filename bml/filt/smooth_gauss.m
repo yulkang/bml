@@ -1,6 +1,8 @@
 function v = smooth_gauss(v, sigma)
 % v = smooth_gauss(v, sigma)
 %
+% Works along the first dimension.
+%
 % sigma: in the unit of elements = sigma_in_t / dt_per_element
 
 if sigma == 0

@@ -1,5 +1,5 @@
 function C = varargin2plot(C, defC)
-% C = varargin2plot(C, defC)
+% C = varargin2plot(C, defaultC)
 %
 % EXAMPLES:
 % varargin2plot({'r-'}, {'b*--'})
@@ -25,8 +25,8 @@ function C = varargin2plot(C, defC)
 % varargin2plot({'+', 'LineStyle', '--'}, {'b:', 'Marker', '*'})
 % ans = 
 %     'LineStyle'    '--'    'Color'    'b'    'Marker'    '+'
-%
-% 2015 (c) Yul Kang. hk2699 at cumc dot columbia dot edu.
+
+% 2015 (c) Yul Kang. hk2699 at columbia dot edu.
     
 if isempty(C)
     C = {};

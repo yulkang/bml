@@ -129,12 +129,24 @@ classdef VisitableTree < DeepCopyable
         % call set/remove_parent from add/remove_child/ren.
         function add_child(Tree, child, name, auto_add_name)
             % add_child(Tree, child, name, auto_add_name)
-            assert(isa(child, 'VisitableTree') && isscalar(child));
-            % May extend to non-scalar child. Currently found no use case.
             if nargin < 4
                 auto_add_name = true;
             end
             if nargin < 3
+                name = '';
+            end
+            assert(isa(child, 'VisitableTree'));
+            
+            if ~isscalar(child)
+                for ii = 1:numel(child)
+                    Tree.add_child(child(ii), name, auto_add_name);
+                end
+                return;
+            end
+            
+%             assert(isscalar(child));
+%             % May extend to non-scalar child. Currently found no use case.
+            if isempty(name)
                 name = child.get_name;
             elseif auto_add_name
                 child.set_name_(name);
@@ -148,6 +160,12 @@ classdef VisitableTree < DeepCopyable
             % remove_child(Tree, child_name|child_obj)
             child = Tree.parse_child(child_or_name);
             child.remove_parent;
+        end
+        function remove_all_children(Tree)
+            children = Tree.get_children;
+            for child = children(:)'
+                Tree.remove_child(child{1});
+            end
         end
         function set_parent(Tree, parent)
             % Set parent and and update descendents' root.

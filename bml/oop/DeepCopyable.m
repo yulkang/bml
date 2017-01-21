@@ -59,7 +59,14 @@ methods
         if already_copied, return; end
         
         % Deep copy properties
-        [dc2, copied] = dc.copy_properties(dc, dc2, dc.deep_copy_props_, copied);
+        if ~isscalar(dc)
+            for ii = 1:numel(dc)
+                [dc2(ii), copied] = ...
+                    dc(ii).copy_properties(dc(ii), dc2(ii), dc(ii).deep_copy_props_, copied);
+            end
+        else
+            [dc2, copied] = dc.copy_properties(dc, dc2, dc.deep_copy_props_, copied);
+        end
     end
     function names = get_deep_copy(dc)
         % Mostly for testing purposes

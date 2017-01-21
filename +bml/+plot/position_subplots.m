@@ -3,21 +3,23 @@ function position_subplots(ax, varargin)
 %
 % OPTIONS
 % -------
-% 'margin_left', 0.2   % If nonempty, overrides margin(1)
-% 'margin_bottom', 0.2 % If nonempty, overrides margin(2)
-% 'margin_right', 0.1  % If nonempty, overrides margin(3)
-% 'margin_top', 0      % If nonempty, overrides margin(4)
-% 'margin', [0.2, 0.2, 0.1, 0] % [left, bottom, right, top]
+% 'margin_left',   0.15
+% 'margin_bottom', 0.15
+% 'margin_right',  0.05
+% 'margin_top',    0.1
+% ... % margin: a four-vector of [left, bottom, right, top].
+% ... % Its non-NaN elements override margin_*
+% 'margin', nan(1,4) 
 % 'btw_row', 0.05 % if vector, btw_row(1) is between rows 1 and 2.
 % 'btw_col', 0.05 % if vector, btw_col(1) is between columns 1 and 2.
 
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'margin_left', 0.15
+    'margin_left',   0.15
     'margin_bottom', 0.15
-    'margin_right', 0.05
-    'margin_top', 0.1
+    'margin_right',  0.05
+    'margin_top',    0.1
     ... % margin: a four-vector of [left, bottom, right, top].
     ... % Its non-NaN elements override margin_*
     'margin', nan(1,4) 

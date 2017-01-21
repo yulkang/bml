@@ -1,13 +1,13 @@
 function pth = pkg2dir(pkg)
 % pth = pkg2dir(pkg)
-%
+
 % 2015 (c) Yul Kang. hk2699 at columbia dot edu.
 
 if isempty(pkg)
     pth = '';
 else
     top_pkg = strsep(pkg, '.', 1);
-    info_top = what(top_pkg);
+    info_top = unique_general(what(top_pkg));
     
     if numel(info_top) > 1
         n = numel(info_top);

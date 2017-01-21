@@ -33,7 +33,7 @@ else
 end 
 
 if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
-        && (length(varargin) <= 1)
+        && ((length(varargin) <= 1) || isnumeric(varargin{1}))
     
     if isempty(varargin)
         v = 0;
@@ -41,17 +41,29 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
         v = varargin{1};
     end
     if isscalar(v)
+        if numel(varargin) < 2
+            plot_opt = {};
+        else
+            plot_opt = varargin2plot(parsePlotSpec(varargin(2)));
+        end
+        
         try
             switch vh
                 case 'h'
                     ax.YBaseline.Visible = 'on';
                     ax.YBaseline.BaseValue = v;
-                    ax.YBaseline.Color = [0 0 0];
+                    
+                    if ~isempty(plot_opt)
+                        set(ax.YBaseline, plot_opt{:});
+                    end
 
                 case 'v'
                     ax.XBaseline.Visible = 'on';
                     ax.XBaseline.BaseValue = v;
-                    ax.XBaseline.Color = [0 0 0];
+                    
+                    if ~isempty(plot_opt)
+                        set(ax.XBaseline, plot_opt{:});
+                    end
             end
             return;
         catch err
@@ -61,8 +73,10 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
 end
 
 %% Save xlim and ylim
-xLim = xlim(ax);
-yLim = ylim(ax);
+xLim0 = xlim(ax);
+yLim0 = ylim(ax);
+xLim = [-1,1] * 1e10;
+yLim = [-1,1] * 1e10;
 hold(ax, 'on');
 
 if nargin < 2
@@ -108,6 +122,6 @@ end
 
 %% Revert xlim and ylim
 hold(ax, 'off');
-xlim(ax, xLim);
-ylim(ax, yLim);
+xlim(ax, xLim0);
+ylim(ax, yLim0);
 end

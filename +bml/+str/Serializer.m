@@ -66,6 +66,18 @@ methods (Static)
         S2s = bml.str.Serializer(varargin{:});
         S = S2s.str2struct(S);
     end
+    function [s, S] = Ss2s(Ss, varargin)
+        fs = fieldnames(Ss);
+        S = struct;
+        for f = fs(:)'
+            vs = bml.matrix.unique_general({Ss.(f{1})});
+            if isscalar(vs)
+                vs = vs{1};
+            end
+            S.(f{1}) = vs;
+        end
+        s = bml.str.Serializer.convert(S);
+    end
 end
 %% User Interface - field name shortener/recoverer
 methods (Static)
@@ -205,6 +217,8 @@ methods (Static)
     function [files, desc, info] = ls(filt, varargin)
         % [files, desc, info] = ls(filt, varargin)
         %
+        % filt: filter string or a cell array of file paths.
+        %
         % OPTIONS
         % -------
         % 'allof', []
@@ -229,6 +243,7 @@ methods (Static)
             'props', {} % properties of Serializer
             'fullpath', true
             });
+        is_filt_list = iscell(filt);
 
         S2s = bml.str.Serializer(opt.props{:});
         
@@ -245,13 +260,17 @@ methods (Static)
             opt.(f{1}) = v;
         end
         
-        info = vVec(dir(filt));
-        files = vVec({info.name});
+        if ~is_filt_list
+            info = vVec(dir(filt));
+            files = vVec({info.name});
+        else
+            files = filt;
+        end
         n = numel(files);
         
         desc = S2s.fileparts(files);
         
-        incl = true(n, 1);
+        incl = true(size(files));
         
         if ~isequal(opt.allof, [])
             incl = incl ...
@@ -276,9 +295,11 @@ methods (Static)
         
         files = files(incl);
         desc = desc(incl);
-        info = info(incl);
+        if ~is_filt_list
+            info = info(incl);
+        end
         
-        if opt.fullpath
+        if opt.fullpath && ~is_filt_list
             pth = bml.file.filt2dir(filt);
             files = fullfile(pth, files);
         end
@@ -427,6 +448,8 @@ end
 %% Internal - manipulate str
 methods
     function [desc, pth, ext] = fileparts(S2s, s)
+        % [desc, pth, ext] = fileparts(S2s, s)
+        % desc: cell array of descriptor strings
         if iscell(s)
             [desc, pth, ext] = cellfun(@S2s.fileparts, s, ...
                 'UniformOutput', false);

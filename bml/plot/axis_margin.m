@@ -14,6 +14,9 @@ S = varargin2S(varargin, {
     'type', 'symmetric' % symmetric | pos | neg | free
     'margin', 0.05
     });
+if nargin < 1
+    h_ax = gca;
+end
 assert(strcmpi(get(h_ax, 'Type'), 'axes'));
 assert(isequal(S.axis, 'x'));
 assert(ismember(S.type, {'symmetric'}));

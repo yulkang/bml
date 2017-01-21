@@ -11,7 +11,7 @@ if nargin < 6, tick_args = {}; end
 plot_args = varargin2S(varargin2plot(plot_args, {
     'Marker', 'o'
     'MarkerSize', 8
-    'LineStyle', '-'
+    'LineStyle', 'none'
     'LineWidth', 2
     'Color', 'k'
     'MarkerEdgeColor', 'w'
@@ -27,7 +27,9 @@ end
 plot_args = varargin2C(plot_args);
 
 tick_args = varargin2plot(tick_args, ...
-    varargin2C(rmfield(varargin2S(plot_args), {'Marker', 'LineWidth'}), {
+    varargin2C(rmfield(varargin2S(plot_args), {
+        'Marker', 'LineWidth', 'LineStyle'
+        }), {
         'Marker', 'none'
         'LineStyle', '-'
         'LineWidth', 0.5
