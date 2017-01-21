@@ -1,4 +1,4 @@
-# bml - Better MatLab / Bless My Life (BML) Package
+# Better MatLab / Bless My Life (BML) Package
 : A collection of ~1000 MATLAB utilities organized in subpackages.
 
 ## Highlights
