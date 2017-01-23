@@ -47,7 +47,7 @@ properties
     % and the initial value is stored in n_samp_burnin0.
     n_samp_burnin0 = [];
 
-    parallel_mode = 'chain';
+    parallel_mode = 'chain'; % 'none'; % 
 end
 %% Props - Results
 properties
@@ -129,7 +129,7 @@ methods
         if length(MC.Constr.lb) == MC.n_th ...
                 && length(MC.Constr.ub) == MC.n_th
             
-            v = diag(MC.Constr.typical_scale) .* factor;
+            v = diag(abs(MC.Constr.typical_scale)) .* factor;
         else
             warning(['lb and ub are not set for all estimands! ' ...
                 'sigma_proposal_from_typical_scale will default to eye(n_th)']);
