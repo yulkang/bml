@@ -14,7 +14,7 @@ methods
         fs = W.get_file_fields0;
         for child_name = fieldnames(W.children)'
             child = W.children.(child_name{1});
-            fs = union_general(fs, child.get_file_fields, ...
+            fs = union_general(fs, child.file_fields, ...
                 'stable', 'rows');
         end
     end

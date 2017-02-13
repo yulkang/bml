@@ -40,7 +40,7 @@ if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
     else
         v = varargin{1};
     end
-    if isscalar(v)
+    if isscalar(v) && v == 0
         if numel(varargin) < 2
             plot_opt = {};
         else
@@ -77,6 +77,8 @@ xLim0 = xlim(ax);
 yLim0 = ylim(ax);
 xLim = [-1,1] * 1e10;
 yLim = [-1,1] * 1e10;
+
+hold0 = get(ax, 'NextPlot');
 hold(ax, 'on');
 
 if nargin < 2
@@ -120,8 +122,8 @@ for ii = 1:2:length(varargin)
 end
 
 
-%% Revert xlim and ylim
-hold(ax, 'off');
+%% Revert hold, xlim, and ylim
+set(ax, 'NextPlot', hold0);
 xlim(ax, xLim0);
 ylim(ax, yLim0);
 end

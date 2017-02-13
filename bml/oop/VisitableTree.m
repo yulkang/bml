@@ -55,10 +55,9 @@ classdef VisitableTree < DeepCopyable
             props = props(:);
             assert(all(cellfun(@ischar, props)));
             for prop = props'
-                assert(isa(Tree.(prop{1}), 'VisitableTree'));
-                Tree.add_child(Tree.(prop{1}), prop{1});
-
-                % To keep Tree.(prop) == Tree.get_child(prop) after deep_copy
+                prop1 = Tree.(prop{1});
+                
+                Tree.add_child(prop1, prop{1});
                 Tree.add_deep_copy(prop{1});
             end         
         end
@@ -127,34 +126,59 @@ classdef VisitableTree < DeepCopyable
         %% Elementary operation: add/remove child/parent
         % Since there can be multiple children but only one parent,
         % call set/remove_parent from add/remove_child/ren.
-        function add_child(Tree, child, name, auto_add_name)
-            % add_child(Tree, child, name, auto_add_name)
-            if nargin < 4
-                auto_add_name = true;
-            end
+        function add_child(Tree, child, name, varargin)
+            % add_child(Tree, child, name, ...)
+            S = varargin2S(varargin, {
+                'auto_add_name', true
+                });
+            
             if nargin < 3
                 name = '';
             end
-            assert(isa(child, 'VisitableTree'));
-            
-            if ~isscalar(child)
+
+            if iscell(child)
                 for ii = 1:numel(child)
-                    Tree.add_child(child(ii), name, auto_add_name);
+                    Tree.add_child( ...
+                        child{ii}, ...
+                        sprintf('c%d_%s', name, ii), ...
+                        varargin{:});
                 end
-                return;
+                
+            elseif isstruct(child)
+                fs = fieldnames(child);
+                for ii = 1:numel(fs)
+                    name1 = fs{ii};
+                    child1 = child.(name1);
+                    
+                    Tree.add_child( ...
+                        child1, ...
+                        sprintf('s%d_%s', name1, ii), ...
+                        varargin{:});
+                end
+                
+            elseif ~isscalar(child)
+                for ii = 1:numel(child)
+                    Tree.add_child( ...
+                        child(ii), ...
+                        sprintf('m%d_%s', name, ii), ...
+                        varargin{:});
+                end
+                
+            else % scalar child.
+                assert(isa(child, 'VisitableTree'));
+                
+                if isempty(name)
+                    name = child.get_name;
+                elseif S.auto_add_name
+                    child.set_name_(name);
+                else
+                    assert(strcmp(name, child.get_name));
+                end
+                Tree.children_.(name) = child;
+                child.set_parent(Tree);
             end
-            
-%             assert(isscalar(child));
-%             % May extend to non-scalar child. Currently found no use case.
-            if isempty(name)
-                name = child.get_name;
-            elseif auto_add_name
-                child.set_name_(name);
-            else
-                assert(strcmp(name, child.get_name));
-            end
-            Tree.children_.(name) = child;
-            child.set_parent(Tree);
+        end
+        function add_child_unit(Tree, child, name, varargin)
         end
         function remove_child(Tree, child_or_name)
             % remove_child(Tree, child_name|child_obj)

@@ -121,6 +121,8 @@ elseif ~ischar(varargin{1})
     elseif isa(S, 'dataset')
         % When S is a dataset, remove 'Properties' from fieldnames.
         f = setdiff(f, {'Properties'}, 'stable');
+    elseif exist('istable', 'file') && istable(S)
+        f = setdiff(f, {'Properties', 'Row', 'Variables'}, 'stable');
     end
     
     if ischar(ix) && isequal(ix, ':')
