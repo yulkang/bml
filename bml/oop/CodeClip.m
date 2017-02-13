@@ -1,6 +1,16 @@
 classdef CodeClip
 % Generates clips of code for OOP.
+%
+% .getsetfun_delegate_dep
+% .getsetfun_delegate
+% .getsetfun_and_dep
+% .getsetfun_dep
+% .getsetfun_dep_hidden
+% .getsetfun
+%
 % See also: getsetfun, metaget, getsetfun_text, show_and_copy
+
+% 2016-2017 (c) Yul Kang. hk2699 at columbia dot edu.
 methods (Static)
     function c = getsetfun_delegate_dep(obj_name, delegator_name, ...
             prop_names, prefixes)
@@ -133,6 +143,15 @@ methods (Static)
         % Copies to clipboard the get/set functions for the property.
         %
         % getsetfun(obj_name, prop_names, prefixes={'set', 'get'})
+        %
+        % EXAMPLE:
+        % CodeClip.getsetfun('Ev', {'ch'}, {'get', 'set'})
+        % function v = get_ch(Ev)
+        %     v = Ev.ch;
+        % end
+        % function set_ch(Ev, v)
+        %     Ev.ch = v;
+        % end     
         
         Clip = bml.oop.CodeClip;
         
@@ -185,13 +204,13 @@ methods (Static, Hidden)
         if strcmpStart('set', prefix)
             c = sprintf([ ...
             'function %3$s%2$s(%1$s, v)\n' ...
-            '    %1$s.%2$s = v;\n' ...
+            '    %1$s.%2$s_ = v;\n' ...
             'end\n' ...
             ], obj_name, prop_name, prefix);
         elseif strcmpStart('get', prefix)
             c = sprintf([ ...
                 'function v = %3$s%2$s(%1$s)\n' ...
-                '    v = %1$s.%2$s;\n' ...
+                '    v = %1$s.%2$s_;\n' ...
                 'end\n' ...
                 ], obj_name, prop_name, prefix);
         else

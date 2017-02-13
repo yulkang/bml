@@ -14,6 +14,9 @@ S = varargin2S(varargin, {
     'type', 'symmetric' % symmetric | pos | neg | free
     'margin', 0.05
     });
+if nargin < 1
+    h_ax = gca;
+end
 assert(strcmpi(get(h_ax, 'Type'), 'axes'));
 assert(isequal(S.axis, 'x'));
 assert(ismember(S.type, {'symmetric'}));
@@ -38,6 +41,10 @@ switch S.type
         else
             axis_lim = max(abs(all_val));
             axis_lim = [-axis_lim, axis_lim] .* (1 + S.margin);
+        end
+        if axis_lim(1) == axis_lim(2)
+            axis_lim(1) = axis_lim(1) - eps;
+            axis_lim(2) = axis_lim(2) + eps;
         end
         
     otherwise
