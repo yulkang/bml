@@ -106,6 +106,9 @@ for ii = 1:2:length(varargin)
         case {'NW', 'SE'}
             x = [min(xLim(1), yLim(1)); max(xLim(2), yLim(2))];
             y = bsxfun(@plus, -x, varargin{ii}(:)');
+            
+        otherwise
+            error('Unsupported kind=%s', vh);
     end
     
     %% Spec

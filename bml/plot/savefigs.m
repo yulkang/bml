@@ -17,7 +17,7 @@ S = varargin2S(varargin, {
     'h_fig', [] % Use gcf if empty
     'verbose', 1
     'resolution', 300
-    'PaperUnit', 'centimeters'
+    'PaperUnits', 'centimeters'
     'PaperPosition', [] % If given, uses PaperPositionMode = 'manual'
     'PaperMargin', [0 0 0 0] % [left bottom right top]
     'to_resize', true
@@ -44,7 +44,7 @@ if S.to_resize
                    + S.PaperMargin(1:2) ...
                    + S.PaperMargin(3:4);
         set(S.h_fig, 'PaperPositionMode', 'manual');
-        set(S.h_fig, 'PaperUnit', S.PaperUnit);
+        set(S.h_fig, 'PaperUnits', S.PaperUnits);
         set(S.h_fig, 'PaperSize', paper_size);
         set(S.h_fig, 'PaperPosition', S.PaperPosition);
     end

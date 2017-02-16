@@ -1,5 +1,7 @@
 function file = make_alias_in_pkg(file0, pkg, varargin)
 % file = make_alias_in_pkg(file0, pkg, varargin)
+%
+% See also bml.pkg.pkg2alias
 
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
