@@ -37,6 +37,7 @@ properties (Dependent)
 end
 properties
     root_data_dir = 'Data';
+    file_name_ = '';
 end
 %% Names from multiple files
 methods
