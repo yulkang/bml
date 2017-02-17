@@ -18,6 +18,7 @@ properties % (Access = private)
         };
     
     S0_file_ = struct; % Fields in addition to properties
+    S_file_ = []; % Overrides S_file if not empty
 end
 properties (Dependent)
     % file_fields = {
@@ -196,25 +197,29 @@ methods
 
         S0_file = PFile.get_S0_file;
         
-        if isempty(file_fields)
-            S_file = struct;
+        if ~isempty(PFile.S_file_)
+            S_file = PFile.S_file_;
         else
-            [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
-            [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
-            ia = intersect(ia1, ia2, 'stable');
-            file_fields = file_fields(ia, :);
-            
-            S2s = bml.str.Serializer;
-            S_file = S2s.field_strrep(S0_file, file_fields);
-            
-%             if ~isempty(file_mult)
-%                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
-%                 file_mult = file_mult(ia, :);
-%             end
-%         
-%             [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
-%                 file_fields, ...
-%                 'mult', file_mult);
+            if isempty(file_fields)
+                S_file = struct;
+            else
+                [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
+                [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
+                ia = intersect(ia1, ia2, 'stable');
+                file_fields = file_fields(ia, :);
+
+                S2s = bml.str.Serializer;
+                S_file = S2s.field_strrep(S0_file, file_fields);
+
+    %             if ~isempty(file_mult)
+    %                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
+    %                 file_mult = file_mult(ia, :);
+    %             end
+    %         
+    %             [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
+    %                 file_fields, ...
+    %                 'mult', file_mult);
+            end
         end
         
         S_file = varargin2S(add_fields, S_file);
