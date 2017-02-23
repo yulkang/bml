@@ -1,5 +1,5 @@
-function [merged, h] = copyaxes(src, dst)
-% [merged, h] = copyaxes(src, dst)
+function [merged, h] = copyaxes(src, dst, varargin)
+% [merged, h] = copyaxes(src, dst, ...)
 %
 % src, dst : handles of the axes.
 %
@@ -7,6 +7,9 @@ function [merged, h] = copyaxes(src, dst)
 % h.src.line, text, legend, and children.
 %
 % merged : the new, merged axes.
+%
+% OPTIONS:
+% 'copy_legend', true % whether to copy legends
 
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
@@ -19,7 +22,17 @@ ylim_dst = ylim(dst);
 xlim_src = xlim(src);
 ylim_src = ylim(src);
 
-h.src.axes = copyobj(h.src.axes, get(h.dst.axes, 'Parent'));
+h.src.peers = getappdata(h.src.axes, 'LayoutPeers');
+fig_dst = get(h.dst.axes, 'Parent');
+
+if isempty(h.src.peers)
+    h.src.axes = copyobj(h.src.axes, fig_dst);
+else
+    h.dst.peers = copyobj([h.src.axes; h.src.peers(:)], fig_dst);
+    h.src.axes = h.dst.peers(1);
+    h.dst.peers = h.dst.peers(2:end);
+end
+
 set(h.src.axes, 'Position', get(h.dst.axes, 'Position'));
 h.src = copyFields(h.src, bml.plot.figure2struct(h.src.axes));
 

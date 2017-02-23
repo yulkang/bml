@@ -21,6 +21,7 @@ for i_ax = n_ax:-1:1
     [ax_dst_new(i_ax), h(i_ax)] = ...
         bml.plot.copyaxes(ax_src(i_ax), ax_dst(i_ax));
 end
+
 h = reshape(h, size(ax_dst));
 ax_dst_new = reshape(ax_dst_new, size(ax_dst));
 
