@@ -1,4 +1,19 @@
 function lim_aft = lim_margin(varargin)
+% lim_aft = lim_margin(varargin)
+%
+% OPTIONS:
+% 'h', [] % handle to axes
+% 'margin', 0.1
+% 'obj_desc', {}
+% 'direction', 'pos' % 'pos'|'neg'|'sym'|'bi'
+% 'method', 'dif'
+% 'fac', 1
+% 'axis', 'y'
+% 'min_v', []
+% 'max_v', []
+
+% 2016 (c) Yul Kang. hk2699 at columbia dot edu.
+
 S = varargin2S(varargin, {
     'h', [] % handle to axes
     'margin', 0.1

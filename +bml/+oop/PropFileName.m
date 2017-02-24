@@ -11,12 +11,13 @@ classdef PropFileName < matlab.mixin.Copyable
 %   'prop_name', multiply_from_prop2filename
 %
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
-properties (Access = private)
+properties % (Access = private)
     file_fields_ = {
         };    
     file_mult_ = {
         };
-    file_name_ = '';
+    
+    S0_file_ = struct; % Fields in addition to properties
 end
 properties (Dependent)
     % file_fields = {
@@ -31,8 +32,9 @@ properties (Dependent)
     
     S0_file
     S_file
-    
-    file_name
+end
+properties
+    root_data_dir = 'Data';
 end
 %% Names from multiple files
 methods
@@ -102,12 +104,6 @@ methods
     end
 end
 %% Files
-properties
-    subdir_ = '';
-end
-properties (Dependent)
-    subdir
-end
 methods
     function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -119,62 +115,22 @@ methods
         
         [file, name] = PFile.get_file(add_fields, remove_fields);
     end
-    function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
+    function [file, name] = get_file(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
-        if ~exist('subdir', 'var'), subdir = PFile.subdir; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile('Data', subdir, name);
-    end
-    function subdir = get.subdir(PFile)
-        subdir = PFile.get_subdir;
-    end
-    function subdir = get_subdir(PFile)
-        if isempty(PFile.subdir_)
-            subdir = class(PFile);
-        else
-            subdir = PFile.subdir_;
-        end
-    end
-    function set.subdir(PFile, subdir)
-        PFile.set_subdir(subdir);
-    end
-    function set_subdir(PFile, subdir)
-        PFile.subdir_ = subdir;
-    end
-    function name = get.file_name(PFile)
-        name = PFile.get_file_name;
+        file = fullfile(PFile.root_data_dir, class(PFile), name);
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
-        S2s = bml.str.Serializer;
-        
-        if ~isempty(PFile.file_name_)
-            name = PFile.file_name_;
-            
-            if ~isequal(add_fields, struct) || ~isempty(remove_fields)
-                S_file = S2s.convert(name);
-                S_file = varargin2S(add_fields, S_file);
-                S_file = rmfield(S_file, remove_fields);
-                name = S2s.convert(S_file);
-            end
-            return;
-        end
-        
         S_file = PFile.get_S_file(add_fields, remove_fields);
-        name = S2s.convert(S_file);
+        name = bml.str.Serializer.convert(S_file);
         
         % Prevent erroneous behavior regarding extensions.
         name = strrep(name, '.', '^'); 
-    end
-    function set.file_name(PFile, name)
-        PFile.set_file_name(name);
-    end
-    function set_file_name(PFile, name)
-        PFile.file_name_ = name;
     end
     function S_file = get.S_file(PFile)
         S_file = PFile.get_S_file;
@@ -221,12 +177,22 @@ methods
         S0_file = PFile.get_S0_file;
     end
     function S0_file = get_S0_file(PFile)
-        C = PFile.get_file_fields;
-        if isempty(C)
-            S0_file = struct;
-        else
-            S0_file = copyprops(struct, PFile, 'props', C(:,1));
+        S0_file = struct;
+        fs = PFile.file_fields;
+        
+        n = size(fs, 1);
+        S0_file_ = PFile.S0_file_;
+        for ii = 1:n
+            fs1 = fs{ii,1};
+            if isprop(PFile, fs1)
+                S0_file.(fs1) = PFile.(fs1);
+            elseif isfield(S0_file_, fs1)
+                S0_file.(fs1) = S0_file_.(fs1);
+            else
+                % Skip.
+            end
         end
+%         S0_file = copyprops(struct, PFile, 'props', fs(:,1));
     end
     function S0_file = convert_from_S_file(PFile, S_file)
         % TODO: Make consistent with get_S_file regarding cc and cmat
@@ -291,7 +257,7 @@ methods
         S0_files = varargin2S(S.add_fields, S0_files);
         S_files = varargin2S(S.add_fields, PFile.convert_to_S_file(S0_files));
         
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_files));
     end
 end
@@ -313,7 +279,7 @@ methods
             'hide_error', true);
         S_file = PFile.convert_to_S_file(S0_file, ...
             'file_fields', file_fields);
-        file = fullfile('Data', class(PFile), ...
+        file = fullfile(PFile.root_data_dir, class(PFile), ...
             bml.str.Serializer.convert(S_file));
     end
 end
@@ -327,8 +293,8 @@ methods
         txt = bml.str.Serializer.convert(S_title);
         txt = bml.str.wrap_text(strrep(txt, '_', '-'));
     end
-    function [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
-        % [ax, files, h] = imgather(W0, row_args, col_args, page_args, add_args, ...)
+    function [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
+        % [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, ...)
         %
         % INPUT:
         % row_args, col_args, page_args
@@ -413,9 +379,9 @@ methods
             ... % if true, gives full title to each subplot
             ... % if false, gives row/column/page title
             'title_subplot', false
-            'to_gltitle', false
+            'to_gltitle', true
             ...
-            'savefigs', false
+            'savefigs', true
             'savefigs_args', {}
             ...
             'to_clf', true % Set false to retrieve ax of multiple pages
@@ -437,7 +403,6 @@ methods
         titles.page = '';
         
         S2s = bml.str.Serializer;
-        h = struct;
         
         if opt.to_clf
             clf;            
@@ -484,39 +449,161 @@ methods
 
                 ax(row,col) = ax1;
             end
-            
-            if ~opt.title_subplot && opt.to_gltitle
-                f_title = @(s) strrep(s, '_', '-');
-                
-                h.title_row = gltitle(ax, 'row', f_title(titles_row));
-                h.title_col = gltitle(ax, 'col', f_title(titles_col));
-                h.title_all = gltitle(ax, 'all', bml.str.wrap_text( ...
-                    f_title(titles_page{page})));
+        end
+
+        if ~opt.title_subplot && opt.to_gltitle
+            f_title = @(s) strrep(s, '_', '-');
+
+            gltitle(ax, 'row', f_title(titles.row));
+            gltitle(ax, 'col', f_title(titles.col));
+            gltitle(ax, 'all', bml.str.wrap_text( ...
+                f_title(titles.page{page})));
+        end
+
+        if opt.savefigs
+            S_file = varargin2S({
+                'page', {S_page_file}
+                'row', {S2s.Ss2s(Ss_row_file)}
+                'col', {S2s.Ss2s(Ss_col_file)}
+                'add', {add_args}
+                });
+            name = S2s.convert(S_file);
+            file = fullfile(PFile.root_data_dir, class(W), name);
+            savefigs(file, opt.savefigs_args{:});
+        end
+    end
+end
+%% Add fields that are not properties
+methods
+    function add_file_fields(W, name_orig, name_short, value)
+        % add_file_fields(W, name_orig, name_short, value)
+        % add_file_fields(W, {name_orig1, name_short1, value1; ...})
+        % 
+        % Give an empty name_short to keep name_orig as is in file names.
+        %
+        % This method is not named set_file_fields, 
+        % becasue it does not replace file_fields with the given ones.
+        
+        if iscell(name_orig)
+            % {name_orig1, name_short1, value1; ...}
+            assert(size(name_orig, 2) == 3);
+            n = size(name_orig, 1);
+            for ii = 1:n
+                W.add_file_fields(name_orig{ii,:});
             end
-            
-            if opt.savefigs
-                S_file = varargin2S({
-                    'page', {S_page_file}
-                    'row', {S2s.Ss2s(Ss_row_file)}
-                    'col', {S2s.Ss2s(Ss_col_file)}
-                    'add', {add_args}
-                    });
-                name = S2s.convert(S_file);
-                file = fullfile('Data', class(W), name);
-                savefigs(file, opt.savefigs_args{:});
-                
-                files{page} = file;
+            return;
+        else
+            assert(ischar(name_orig));
+            assert(ischar(name_short) || isempty(name_short));
+        end
+        
+        fs = W.file_fields;
+        [~, locb] = ismember(name_orig, fs(:,1));
+        
+        if locb == 0
+            % Then add to file_fields_, the one not specified directly
+            % by get_file_fields
+            fs_ = W.file_fields_;
+            n1 = size(fs_, 1) + 1;
+            W.file_fields_{n1, 1} = name_orig;
+            W.file_fields_{n1, 2} = name_short;
+        end
+
+        % Assign value if given
+        if nargin >= 4
+            if isprop(W, name_orig)
+                if ~isequal(W.(name_orig), value)
+                    try
+                        varargin2props(W, {name_orig, value});
+                    catch err
+                        warning(err_msg(err));
+                    end
+                end
+            else
+                W.S0_file_.(name_orig) = value;
             end
+        end
+    end
+    function copy_file_fields(W, src, file_fields)
+        % USAGE:
+        % copy_file_fields(W, PFile_src)
+        % copy_file_fields(W, PFile_src, {name_orig1; name_orig2; ...})
+        % copy_file_fields(W, src, file_fields)
+        % - src: struct or object
+        % - file_fields: {name_orig1, name_short1; ...}
+        
+        if nargin < 3
+            assert((isstruct(src) && isfield(src, 'file_fields')) ...
+                || isprop(src, 'file_fields'));
+            file_fields = src.file_fields;
+        else
+            assert(iscell(file_fields));
+            
+            if size(file_fields, 2) == 1
+                assert((isstruct(src) && isfield(src, 'file_fields')) ...
+                    || isprop(src, 'file_fields'));
+                file_fields0 = src.file_fields;
+                if isempty(file_fields0)
+                    file_fields = cell(0,2);
+                else
+                    [~,~,ib] = intersect( ...
+                        file_fields(:,1), ...
+                        file_fields0(:,1), ...
+                        'stable'); % Follows the order of file_fields
+                    
+                    file_fields = file_fields0(ib,:);
+                end
+            else
+                assert(size(file_fields, 2) == 2);
+            end
+        end
+        fs = file_fields(:,1);
+        n = size(fs, 1);
+        S0_file = src.S0_file;
+        for ii = 1:n
+            W.add_file_fields( ...
+                file_fields{ii,1}, file_fields{ii,2}, ...
+                S0_file.(file_fields{ii,1}));
         end
     end
 end
 %% Properties
 methods
     function v = get.file_fields(W)
-        v = W.get_file_fields;
+        v = W.get_file_fields_merged_;
     end
+    function fs = get_file_fields_merged_(W)
+        fs0 = W.get_file_fields;
+        fs_ = W.file_fields_;
+        
+        if isempty(fs_)
+            % Nothing to add to fs0
+            fs = fs0;
+        else
+            % When there are overlapping fields in fs and fs_, 
+            % fs, the one returned by get_file_fields, is prioritized.
+            [~, ia] = setdiff(fs_(:,1), fs0(:,1), 'stable');
+
+            fs = [fs0; fs_(ia, :)];
+        end
+    end
+    function v = get_file_fields(~)
+        v = cell(0,2);
+    end
+    
     function set.file_fields(W, v)
         W.set_file_fields(v);
+    end
+    function set_file_fields(W, v)
+        % set_file_fields(W, file_fields)
+        %
+        % USAGE:
+        % file_fields = {name_orig1, name_short1; ...}
+        % file_fields = {name_orig1, name_short1, value1; ...}
+        n = size(v, 1);
+        for ii = 1:n
+            W.add_file_fields(v{ii,:});
+        end
     end
 
     function v = get.file_mult(W)
@@ -524,13 +611,6 @@ methods
     end
     function set.file_mult(W, v)
         W.set_file_mult(v);
-    end
-
-    function v = get_file_fields(W)
-        v = W.file_fields_;
-    end
-    function set_file_fields(W, v)
-        W.file_fields_ = v;
     end
 
     function v = get_file_mult(W)
