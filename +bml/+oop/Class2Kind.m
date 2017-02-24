@@ -23,8 +23,6 @@ methods
     end
     function [v, v0] = get_kind(W)
         if isempty(W.kind_)
-            v = W.kind_;
-        else
             v0 = class(W);
             if isempty(W.kind_general)
                 v = v0;
@@ -33,6 +31,8 @@ methods
                 assert(~isempty(ix));
                 v = v0(ix:end);
             end
+        else
+            v = W.kind_;            
         end
     end
 end
