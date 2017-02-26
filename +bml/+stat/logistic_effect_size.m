@@ -58,11 +58,14 @@ switch S.mode
         else
             plot_fcns = [];
         end
-        options = optimset( ...
-            'TolX', coef0.SE * S.tol_x_rel, ...
-            'PlotFcns', plot_fcns);
-        % options = optimset( ...
-        %     'TolX', coef0.SE / 10);
+        if S.to_plot && ~is_in_parallel
+            options = optimset( ...
+                'TolX', coef0.SE * S.tol_x_rel, ...
+                'PlotFcns', plot_fcns);
+        else
+            options = optimset( ...
+                'TolX', coef0.SE * S.tol_x_rel);
+        end
 
         for ii = 2:-1:1
             sgn = sign(ii - 1.5);
