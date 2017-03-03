@@ -73,8 +73,18 @@ switch S.mode
 
             fun = @(v) sum(glmpower(b0(:)' .* ~ix_coef + v .* ix_coef, X, 'logit', ...
                 'n_sim', S.n_sim) .* ix_coef) - S.beta;
-            [v_res(ii), fval(ii), exitflag(ii), output{ii}] = ...
-                fzero(fun, [0, ub1], options);
+            
+            fv0 = fun(0);
+            fv1 = fun(ub1);
+            if sign(fv0) ~= sign(fv1)
+                [v_res(ii), fval(ii), exitflag(ii), output{ii}] = ...
+                    fzero(fun, [0, ub1], options);
+            else
+                v_res(ii) = nan;
+                fval(ii) = nan;
+                exitflag(ii)=  nan;
+                output{ii} = struct;
+            end
         end
         
         res = packStruct(v_res, fval, exitflag, output, coef0, S);
