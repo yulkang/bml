@@ -36,10 +36,12 @@ function [h_line, h_marker] = gradLine(x,y,varargin)
 %% Line
 if ~isvector(x) && size(x, 2) > 1
     for ii = size(x, 2):-1:1
-        [h_line(ii), h_marker(:,ii)] = ...
-            bml.plot.gradLine(x(:,ii), y(:,ii), c, varargin{:});
+        [h_line{ii}, h_marker{ii}] = ...
+            bml.plot.gradLine(x(:,ii), y(:,ii), varargin{:});
         hold on;
     end
+    h_line = cat(2, h_line{:});
+    h_marker = cat(2, h_marker{:});
     hold off;
     return;
 end
@@ -97,8 +99,8 @@ h_line = patch(S.ax, [x(:);NaN],[y(:);NaN],z, 'CData', permute(c,[1,3,2]), ...
 view(2);
 
 %% Marker
+h_marker = gobjects(n, 1);
 if ~strcmp(marker.Marker, 'none')
-    h_marker = gobjects(n, 1);
     for ii = 1:n
         marker1 = marker;
         if strcmp(marker1.MarkerFaceColor, 'auto')
