@@ -14,7 +14,11 @@ S = varargin2S(varargin, {
     'confirm', true
     });
 if isequal(S.files, [])
-    S.files = uigetfileCell(S.filt);
+    if S.confirm
+        S.files = uigetfileCell(S.filt);
+    else
+        S.files = dirfiles(S.filt);
+    end
 end
 if isequal(S.files, {})
     files_src = {};
