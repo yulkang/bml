@@ -1,5 +1,5 @@
-function [hLine, hPatch] = errorbarShade(x, y, e, spec, alpha, specLine, specPatch)
-% [hLine, hPatch] = errorbarShade(x, y, e, spec, [alpha = 0.5], specLine, specPatch)
+function [hLine, hPatch] = errorbarShade(x, y, e, spec, alpha, specLine, specPatch, varargin)
+% [hLine, hPatch] = errorbarShade(x, y, e, spec, [alpha = 0.5], specLine, specPatch, ...)
 %
 % x : always a vector.
 % y : vector or matrix. If matrix, one column per curve.
@@ -16,8 +16,12 @@ function [hLine, hPatch] = errorbarShade(x, y, e, spec, alpha, specLine, specPat
 
 if ~exist('alpha', 'var') || isempty(alpha), alpha = 0.25; end
 if ~exist('spec', 'var') || isempty(spec), spec  = 'k-'; end
-if ~exist('specLine', 'var'), specLine = {}; end
-if ~exist('specPatch', 'var'), specPatch = {}; end
+if ~exist('specLine', 'var') || isempty(specLine), specLine = {}; end
+if ~exist('specPatch', 'var') || isempty(specPatch), specPatch = {}; end
+
+S = varargin2S(varargin, {
+    'ax', gca
+    });
 
 specLine = varargin2C(specLine, {
     'LineWidth', 2
@@ -44,7 +48,7 @@ elseif ismatrix(y)
     hLine = cell(1,n);
     hPatch = cell(1,n);
     
-    if nargin < 4, 
+    if nargin < 4
         spec = hsv2(n);
     end
     
@@ -56,7 +60,7 @@ elseif ismatrix(y)
         end
         
         [hLine{ii}, hPatch{ii}] = errorbarShade(x(:,ii), y(:,ii), ce, ...
-            spec(ii,:), alpha, specLine, specPatch);
+            spec(ii,:), alpha, specLine, specPatch, varargin{:});
     end
     return;
 else
@@ -85,11 +89,11 @@ else
 end
 
 if ~isempty(specColor)
-    hPatch = patch(x2, y2 + e2, specColor, ...
+    hPatch = patch(S.ax, x2, y2 + e2, specColor, ...
                        'EdgeColor', 'none', ...
                        'FaceColor', specColor, 'FaceAlpha', alpha, specPatch{:}); 
 else
-    hPatch = patch(x2, y2 + e2, '-', ...
+    hPatch = patch(S.ax, x2, y2 + e2, '-', ...
                        'EdgeColor', 'none', ...
                        'FaceAlpha', alpha, specPatch{:}); 
 end
@@ -102,7 +106,7 @@ for eFac = 0 % -1:1
         C = [{'-'}, varargin2C(specLine, {'Color', spec})];
     end
     for jj = 1:size(e, 2)
-        hLine = plot(x, y + e(:,jj) * eFac, C{:}); hold on;
+        hLine = plot(S.ax, x, y + e(:,jj) * eFac, C{:}); hold on;
     end
 end
 hold off;
