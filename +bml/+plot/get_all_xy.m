@@ -37,6 +37,6 @@ catch
         xs{ii} = vVec(get(ch(ii), 'XData'));
         ys{ii} = vVec(get(ch(ii), 'YData'));
     end
-    xy = [cell2mat(xs), cell2mat(ys)];
+    xy = [cell2vec(xs), cell2vec(ys)];
 end
 end
