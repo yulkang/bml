@@ -75,8 +75,8 @@ end
 %% Save xlim and ylim
 xLim0 = xlim(ax);
 yLim0 = ylim(ax);
-xLim = [-1,1] * 1e10;
-yLim = [-1,1] * 1e10;
+xLim = [-1,1] * max(1e5, max(abs(xLim0)));
+yLim = [-1,1] * max(1e5, max(abs(xLim0)));
 
 hold0 = get(ax, 'NextPlot');
 hold(ax, 'on');
