@@ -1,5 +1,5 @@
 function [hLine, hPatch] = errorbarShade(x, y, e, spec, alpha, specLine, specPatch, varargin)
-% [hLine, hPatch] = errorbarShade(x, y, e, spec, [alpha = 0.5], specLine, specPatch)
+% [hLine, hPatch] = errorbarShade(x, y, e, spec, [alpha = 0.5], specLine, specPatch, ...)
 %
 % x : always a vector.
 % y : vector or matrix. If matrix, one column per curve.
