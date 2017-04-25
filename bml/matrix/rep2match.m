@@ -3,6 +3,8 @@ function varargout = rep2match(inp, varargin)
 %
 % Return arrays that are replicated to match the maximum size on each dimension.
 %
+% inp{k}: k-th array.
+%
 % See also: rep2fit, plot3.
 %
 % 2013 (c) Yul Kang, hk2699 at columbia dot edu.

@@ -18,6 +18,7 @@ properties % (Access = private)
         };
     
     S0_file_ = struct; % Fields in addition to properties
+    S_file_ = []; % Overrides S_file if not empty
 end
 properties (Dependent)
     % file_fields = {
@@ -32,9 +33,12 @@ properties (Dependent)
     
     S0_file
     S_file
+    
+    file_name
 end
 properties
     root_data_dir = 'Data';
+    file_name_ = '';
 end
 %% Names from multiple files
 methods
@@ -104,6 +108,12 @@ methods
     end
 end
 %% Files
+properties
+    subdir_ = '';
+end
+properties (Dependent)
+    subdir
+end
 methods
     function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
@@ -115,22 +125,59 @@ methods
         
         [file, name] = PFile.get_file(add_fields, remove_fields);
     end
-    function [file, name] = get_file(PFile, add_fields, remove_fields)
+    function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
+        if ~exist('subdir', 'var'), subdir = PFile.subdir; end
         
         name = PFile.get_file_name(add_fields, remove_fields);
-        file = fullfile(PFile.root_data_dir, class(PFile), name);
+        file = fullfile(PFile.root_data_dir, subdir, name);
+    end
+    function subdir = get.subdir(PFile)
+        subdir = PFile.get_subdir;
+    end
+    function subdir = get_subdir(PFile)
+        if isempty(PFile.subdir_)
+            subdir = class(PFile);
+        else
+            subdir = PFile.subdir_;
+        end
+    end
+    function set.subdir(PFile, subdir)
+        PFile.set_subdir(subdir);
+    end
+    function set_subdir(PFile, subdir)
+        PFile.subdir_ = subdir;
     end
     function name = get_file_name(PFile, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
+        S2s = bml.str.Serializer;
+        
+        if ~isempty(PFile.file_name_)
+            name = PFile.file_name_;
+            
+            if ~isequal(add_fields, struct) || ~isempty(remove_fields)
+                S_file = S2s.convert(name);
+                S_file = varargin2S(add_fields, S_file);
+                S_file = rmfield(S_file, remove_fields);
+                name = S2s.convert(S_file);
+            end
+            return;
+        end
+        
         S_file = PFile.get_S_file(add_fields, remove_fields);
-        name = bml.str.Serializer.convert(S_file);
+        name = S2s.convert(S_file);
         
         % Prevent erroneous behavior regarding extensions.
         name = strrep(name, '.', '^'); 
+    end
+    function set.file_name(PFile, name)
+        PFile.set_file_name(name);
+    end
+    function set_file_name(PFile, name)
+        PFile.file_name_ = name;
     end
     function S_file = get.S_file(PFile)
         S_file = PFile.get_S_file;
@@ -150,25 +197,29 @@ methods
 
         S0_file = PFile.get_S0_file;
         
-        if isempty(file_fields)
-            S_file = struct;
+        if ~isempty(PFile.S_file_)
+            S_file = PFile.S_file_;
         else
-            [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
-            [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
-            ia = intersect(ia1, ia2, 'stable');
-            file_fields = file_fields(ia, :);
-            
-            S2s = bml.str.Serializer;
-            S_file = S2s.field_strrep(S0_file, file_fields);
-            
-%             if ~isempty(file_mult)
-%                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
-%                 file_mult = file_mult(ia, :);
-%             end
-%         
-%             [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
-%                 file_fields, ...
-%                 'mult', file_mult);
+            if isempty(file_fields)
+                S_file = struct;
+            else
+                [~, ia1] = setdiff(file_fields(:,1), remove_fields(:), 'stable');
+                [~, ia2] = setdiff(file_fields(:,2), remove_fields(:), 'stable');
+                ia = intersect(ia1, ia2, 'stable');
+                file_fields = file_fields(ia, :);
+
+                S2s = bml.str.Serializer;
+                S_file = S2s.field_strrep(S0_file, file_fields);
+
+    %             if ~isempty(file_mult)
+    %                 [~, ia] = setdiff(file_mult(:,1), remove_fields(:), 'stable');
+    %                 file_mult = file_mult(ia, :);
+    %             end
+    %         
+    %             [S_file, S0_file] = bml.str.Serializer.convert_to_S_file(PFile, ...
+    %                 file_fields, ...
+    %                 'mult', file_mult);
+            end
         end
         
         S_file = varargin2S(add_fields, S_file);

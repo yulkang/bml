@@ -503,7 +503,10 @@ methods
         s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
         if isempty(s)
             v = [];
-        elseif all(ismember(s, ['-', '.', '0':'9', ',']))
+        elseif all(ismember(strrep_cell(s, {
+                'NaN', '0'
+                'Inf', '0'
+                }), ['-', '.', '0':'9', ',']))
             v = eval(['[', s, ']']);
         elseif s(1) == '[' && s(end) == ']'
             if all(ismember(s(2:(end-1)), ['-', '.', '0':'9', ',']))

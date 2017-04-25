@@ -1,5 +1,8 @@
 function color = color_lines(desc)
 % color = color_lines(desc)
+% desc: 'black'|'k', 'white'|'w', 'blue'|'b', 'tangerine'|'t',
+%       'yellow'|'y'|'orange'|'o', 'purple'|'p', 'green'|'g',
+%       'cyan'|'c', 'red'|'r'
 
 if ~isscalar(desc)
     if ischar(desc)
