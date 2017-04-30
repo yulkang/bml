@@ -38,7 +38,7 @@ S = varargin2S(varargin, {
     'opt_rowtitle', {}
     'opt_coltitle', {}
     'fig_mode', true % When importing bitmap, hide axes.
-    'joinaxes', true
+    'joinaxes', false % true
     'opt_joinaxes', {}
     });
 
