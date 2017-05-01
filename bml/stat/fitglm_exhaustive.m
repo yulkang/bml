@@ -65,6 +65,8 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
 % Then estimate the time and memory needed by multiplying 
 % the elapsed time and mdls's size in the memory (Bytes) by 2^(size(X,2)-8).
 %
+% See also: crossval_glmfit
+%
 % 2015 (c) Yul Kang. hk2699 at columbia dot edu.
 
     if ~exist('glm_args', 'var')
@@ -184,7 +186,8 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     end
 
     param_incl = param_incl_all(ic_min_ix);
-
+    param_incl_tf = dec2bin(param_incl, n_param) == '1';
+    
     % Reduce output size
     if ~strcmp(S.model_criterion, 'crossval')
         ic_all_se = [];
@@ -194,7 +197,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
     end
     
     % Pack output
-    info = packStruct(n_param, param_incl, ic_min, ic_min_ix, ...
+    info = packStruct(n_param, param_incl, param_incl_tf, ic_min, ic_min_ix, ...
         ic_all, param_incl_all, ...
         ic_all0, ic_all_se);
     info = copyFields(info, S);
@@ -215,7 +218,7 @@ function [ic_all, ic_all0, mdls] = ...
     end
     
     model_criterion = S.model_criterion;
-    crossval_args = S.crossval_args;
+    crossval_args = varargin2C(S.crossval_args);
     if isempty(S.group)
         n = size(X, 1);
         group = ones(n, 1);
