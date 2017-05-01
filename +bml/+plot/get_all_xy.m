@@ -27,7 +27,7 @@ ch = findobj(ax, obj_desc{:});
 try
     xs = get(ch, 'XData');
     ys = get(ch, 'YData');
-    xy = [vVec([xs{:}]), vVec([ys{:}])];
+    xy = [vVec(cell2vec(xs)), vVec(cell2vec(ys))];
 catch
     n_ch = numel(ch);
     xs = cell(n_ch, 1);
@@ -37,6 +37,6 @@ catch
         xs{ii} = vVec(get(ch(ii), 'XData'));
         ys{ii} = vVec(get(ch(ii), 'YData'));
     end
-    xy = [cell2vec(xs), cell2vec(ys)];
+    xy = [vVec(cell2vec(xs)), vVec(cell2vec(ys))];
 end
 end
