@@ -11,6 +11,7 @@ if isempty(y)
     stats = packStruct(p, se);
     dev = nan;
     nll = nan;
+    bic = nan;
 else
     [b, dev, stats] = glmfit(X, y, distr, varargin{:});
     p = stats.p;
@@ -32,6 +33,8 @@ else
         otherwise
             nll  = nan;
     end
+    
+    bic = bml.stat.bic(nll, size(X, 1), size(X, 2) + 1);
 end
 
-S = packStruct(b, dev, stats, p, se, nll); % , X, y, distr);
+S = packStruct(b, dev, stats, p, se, nll, bic); % , X, y, distr);
