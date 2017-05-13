@@ -13,6 +13,7 @@ function h = text_align(txt, varargin)
 
 assert(ischar(txt) || iscell(txt));
 S = varargin2S(varargin, {
+    'ax', gca
     'corner', 'NW'
     'margin', [0 0] + 0.025
     'margin_unit', 'proportion'
@@ -62,7 +63,7 @@ switch S.corner(2)
 end
 C = varargin2C(S.text_props, text_props_default);
 if ~isvalidhandle(S.h_txt)
-    h = text(x, y, txt, C{:});
+    h = text(S.ax, x, y, txt, C{:});
 else
     h = S.h_txt;
     set(h, 'String', txt, 'Position', [x, y, 0]);
