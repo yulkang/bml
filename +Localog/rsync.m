@@ -15,7 +15,7 @@ function cmd = rsync(op, local, varargin)
 % 'verbose',  true
 
 S = varargin2S(varargin, {
-    'remote',   'pat' % 'gpu'
+    'remote',   'metheny' % 'pat' % 'gpu'
     'opt',      '-avz -e ssh'
     'exclude',  '' % default, bak, code
     'cmd_only', false
