@@ -507,8 +507,8 @@ methods
 
             gltitle(ax, 'row', f_title(titles.row));
             gltitle(ax, 'col', f_title(titles.col));
-            gltitle(ax, 'all', bml.str.wrap_text( ...
-                f_title(titles.page{page})));
+%             gltitle(ax, 'all', bml.str.wrap_text( ...
+%                 f_title(titles.page{page})));
         end
 
         if opt.savefigs
@@ -519,7 +519,7 @@ methods
                 'add', {add_args}
                 });
             name = S2s.convert(S_file);
-            file = fullfile(PFile.root_data_dir, class(W), name);
+            file = fullfile(W0.root_data_dir, class(W), name);
             savefigs(file, opt.savefigs_args{:});
         end
     end
