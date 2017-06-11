@@ -33,6 +33,8 @@ properties
     
     to_plot_online = true;
     n_samp_btw_plot = 50;
+    
+    seed = 'shuffle';
 end
 %% Props - Results
 properties (Dependent)
@@ -57,6 +59,8 @@ properties
     fun_nll_proposal % function(th_src, th_dst) % gives p (column vec)
     
     n_samp_ = 0;
+    
+    RStream = [];
     
     th_now
     nll_now
@@ -87,15 +91,16 @@ methods
             MC.sigma_proposal = MC.get_sigma_proposal_auto;
         end
         
+        % Random number generator
+        MC.RStream = RandStream('mt19937ar', MC.seed);
+%         rng('shuffle');
+        
         % Multivariate normal proposal
         MC.mu_proposal = zeros(1, MC.n_th);
         MC.fun_proposal = @(th_src, n, mu, sigma) bsxfun(@plus, th_src, ...
-            mvnrnd(mu, sigma, n));
+            bml.math.mvnrnd(MC.RStream, mu, sigma, n));
         MC.fun_nll_proposal = @(th_src, th_dst, mu, sigma) ...
             bml.stat.logmvnpdf(bsxfun(@minus, th_dst, th_src), mu, sigma);
-        
-        % Random number generator
-        rng('shuffle');
         
         % Preallocate
         MC.preallocate;
@@ -168,7 +173,7 @@ methods
         end
         MC.add_samp(MC.th_now, MC.nll_now, p_accept, to_transition);
     end
-    function [to_transition, p_accept]= get_to_transition(~, ...
+    function [to_transition, p_accept]= get_to_transition(MC, ...
             nll_now, nll_proposal)
         
         if nll_proposal == inf
@@ -181,7 +186,7 @@ methods
             
         else % nll_proposal >= nll_now
             p_accept = exp(nll_now - nll_proposal); % <= 1
-            r = rand;
+            r = rand(MC.RStream);
             to_transition = r <= p_accept;
         end
     end

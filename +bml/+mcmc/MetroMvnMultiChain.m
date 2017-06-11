@@ -10,6 +10,10 @@ properties
     MC_props = {}; % Properties
     MCs = {}; % MCMCs
     
+    % 'order'|'shuffle'|vector
+    % seeds - if 'order', use 1:n_MCs.
+    seeds = 'order'; 
+    
     th0s % th0s(c,k): initial value of k-th estimand of c-th subchain.
     sigma_th0s % sigma to sample th0s with.
     
@@ -88,6 +92,15 @@ methods
             });
         
         for ii = 1:MC.n_MCs
+            switch MC.seeds
+                case 'order'
+                    seed = ii;
+                case 'shuffle'
+                    seed = 'shuffle';
+                otherwise
+                    seed = MC.seeds(ii);
+            end
+            
             % Priority: MC_props > varargin > defaults
             C = varargin2C(varargin2C(MC.MC_props, varargin), {
                 'th0', MC.th0s(ii, :)
@@ -98,6 +111,7 @@ methods
                 'n_samp_max', MC.n_samp_max
                 'n_samp_burnin', MC.n_samp_burnin
                 'parallal_mode', MC.parallel_mode
+                'seed', seed
                 });
             MC.MCs{ii} = bml.mcmc.MetroMvnAdaCov(C{:});
         end
