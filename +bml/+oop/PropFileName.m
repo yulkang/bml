@@ -430,7 +430,7 @@ methods
             ... % if true, gives full title to each subplot
             ... % if false, gives row/column/page title
             'title_subplot', false
-            'to_gltitle', true
+            'to_gltitle', false
             ...
             'savefigs', true
             'savefigs_args', {}
