@@ -12,7 +12,7 @@ properties
     
     % 'order'|'shuffle'|vector
     % seeds - if 'order', use 1:n_MCs.
-    seeds = 'order'; 
+    seeds = 'shuffle'; 
     
     th0s % th0s(c,k): initial value of k-th estimand of c-th subchain.
     sigma_th0s % sigma to sample th0s with.

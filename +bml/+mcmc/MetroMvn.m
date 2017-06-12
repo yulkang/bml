@@ -92,13 +92,13 @@ methods
         end
         
         % Random number generator
-        MC.RStream = RandStream('mt19937ar', MC.seed);
+        MC.RStream = RandStream('mt19937ar', 'Seed', MC.seed);
 %         rng('shuffle');
         
         % Multivariate normal proposal
         MC.mu_proposal = zeros(1, MC.n_th);
         MC.fun_proposal = @(th_src, n, mu, sigma) bsxfun(@plus, th_src, ...
-            bml.math.mvnrnd(MC.RStream, mu, sigma, n));
+            bml.math.mvnrnd_stream(MC.RStream, mu, sigma, n));
         MC.fun_nll_proposal = @(th_src, th_dst, mu, sigma) ...
             bml.stat.logmvnpdf(bsxfun(@minus, th_dst, th_src), mu, sigma);
         
