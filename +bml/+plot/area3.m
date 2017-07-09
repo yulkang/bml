@@ -1,5 +1,5 @@
-function area3(x0, y0, varargin)
-% area3(x, y, varargin)
+function [h_face, h_line] = area3(x0, y0, varargin)
+% [h_face, h_line] = area3(x, y, varargin)
 %
 % 'base', 0
 % 'plane', 'xy'
@@ -58,14 +58,25 @@ switch S.plane
         x_patch = x([1, 1:end, end]);
         y_patch = y([1, 1:end, end]);
         z_patch = [base; z; base];
+    
+    case 'yz'
+        base = S.base + S.origin(3);
+
+        y = x0(:) + S.origin(2);
+        x = S.origin(1) + zeros(size(y)) - S.z_offset;
+        z = base + y0;
+
+        x_patch = x([1, 1:end, end]);
+        y_patch = y([1, 1:end, end]);
+        z_patch = [base; z; base];
 end
 
-patch( ...
+h_face = patch( ...
     'XData', x_patch, ...
     'YData', y_patch, ...
     'ZData', z_patch, ...
     S.opt_patch{:});
 hold on;
 
-plot3(x, y, z, S.opt_plot{:});
+h_line = plot3(x, y, z, S.opt_plot{:});
 hold off;
