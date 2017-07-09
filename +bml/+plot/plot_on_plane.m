@@ -1,14 +1,16 @@
-function plot_on_plane(x0, y0, varargin)
-% area3(x, y, varargin)
+function h = plot_on_plane(x0, y0, varargin)
+% h = plot_on_plane(x0, y0, varargin)
 %
+% OPTIONS:
 % 'base', 0
 % 'plane', 'xy'
 % 'origin', [0 0 0]
 % 'z_offset', 0 % Positive is closer to the viewer at -x, -y, +z.
 % 'Color', 'k'
-% 'FaceAlpha', 0.25
-% 'opt_patch', {}
 % 'opt_plot', {}
+%
+% opt_plot:
+% 'Color', S.Color
 % 
 % 2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
@@ -45,5 +47,5 @@ switch S.plane
         z = base + y0;
 end
 
-plot3(x, y, z, S.opt_plot{:});
+h = plot3(x, y, z, S.opt_plot{:});
 hold off;
