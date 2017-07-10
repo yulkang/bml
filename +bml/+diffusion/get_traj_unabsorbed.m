@@ -67,6 +67,8 @@ elseif y_end < bound(end, 1) + dy
         y11 = y(iy);
         p_y_bef_given_y = p_y_bef_given_y + normpdf(y - y11, -mu, sig);
     end
+else
+    p_y_bef_given_y = normpdf(y - y_end, -mu, sig);
 end
 p_y_posterior = p_y_bef_given_y .* unabs(:,nt - 1);
 y1 = randsample(y, 1, true, p_y_posterior);
@@ -81,5 +83,3 @@ for it = (nt-1):-1:2
     traj(it-1) = y1;
 end
 traj(1) = y0;
-
-plot(t, traj)
