@@ -9,22 +9,5 @@ function varargout = dealDef(C, default_values, empty_if_no_default)
 %
 % 2014 (c) Yul Kang. hk2699 at columbia dot edu.
 
-varargout = cell(1, nargout);
-nd = length(default_values);
-
 if nargin < 3, empty_if_no_default = false; end
-
-% Copy inputs
-for ii = 1:length(C)
-    varargout{ii} = C{ii};
-    
-    % If empty2d is true, empty inputs are replcaed with the default.
-    if empty_if_no_default && isempty(varargout{ii}) && (ii <= nd)
-        varargout{ii} = default_values{ii};
-    end
-end
-
-% Copy defaults
-for ii = (length(C)+1):min(nargout, nd)
-    varargout{ii} = default_values{ii};
-end
+varargout = dealDefCell(C, default_values, empty_if_no_default, nargout);
