@@ -11,7 +11,7 @@ function files = savefigs(file, varargin)
 % 'verbose', 1
 
 S = varargin2S(varargin, {
-    'ext', {'.fig', '.png'}
+    'ext', {'.png', '.fig'}
     'subdir_w_ext', false % e.g., png/*.png
     'size', [400 300] % Set empty to keep original.
     'h_fig', [] % Use gcf if empty
