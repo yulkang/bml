@@ -33,6 +33,10 @@ end
 methods
     function add_deep_copy(dc, names)
         % add_deep_copy(dc, names)
+        %
+        % names: cell array of name of the properties
+        %     Each property can be an object, a struct of objects,
+        %     or a cell array of objects.
         if ischar(names), names = {names}; end
         assert(all(cellfun(@ischar, names)));        
         dc.deep_copy_props_ = union(dc.deep_copy_props_, names, 'stable');
