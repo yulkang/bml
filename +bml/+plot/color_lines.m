@@ -1,12 +1,14 @@
 function color = color_lines(desc)
 % color = color_lines(desc)
 
-if ~isscalar(desc)
-    if ischar(desc)
-        color = arrayfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
-    else
+if ~ischar(desc)
+    assert(iscell(desc));
+% if ~isscalar(desc)
+%     if ischar(desc)
+%         color = arrayfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
+%     else
         color = cellfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
-    end
+%     end
     color = cell2mat2(color(:));
     return;
 end
@@ -31,6 +33,10 @@ switch desc
         color = color0(6, :);
     case {'r', 'red'}
         color = color0(7, :);
+    case {'m', 'magenta'}
+        color = [255 0 255] / 255;
+%     case {'l', 'lavender'}
+%         color = [204 202 255] / 255;
     otherwise
         error('Unkown desc: %s\n', desc);
 end    
