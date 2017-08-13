@@ -1,8 +1,10 @@
-function h = plot_significant_interval(sig, x, varargin)
-% h = plot_significant_interval(sig, x)
+function [h, st, en] = plot_significant_interval(sig, x, varargin)
+% [h, st, en] = plot_significant_interval(sig, x)
 %
 % sig : logical vector.
 % x : vector of the same length as sig. Assumed to be regularly spaced.
+%
+% st, en: vector of indices where the significant intervals start & end.
 %
 % OPTIONS:
 % 'y', 0
