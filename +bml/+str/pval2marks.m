@@ -1,11 +1,15 @@
 function s = pval2marks(p, varargin)
 % s = pval2marks(p, ...)
 %
+% OPTIONS:
+% 'thres', [1, 0.1, 0.05, 0.01, 0.001]
+% 'marks', {'n.s.', '+', '*', '**', '***'};
+%
 % 2015 (c) Yul Kang. hk2699 at columbia dot edu.
 
 S = varargin2S(varargin, {
-    'thres', [0.1, 0.05, 0.01, 0.001]
-    'marks', {'+', '*', '**', '***'};
+    'thres', [1.1, 0.1, 0.05, 0.01, 0.001]
+    'marks', {'n.s.', '+', '*', '**', '***'};
     });
 assert(isnumeric(S.thres) && isvector(S.thres));
 assert(issorted(flip(S.thres(:))));
@@ -22,7 +26,7 @@ if isempty(p)
     return;
     
 elseif ~isscalar(p)
-    s = arrayfun(@pval2marks, p, varargin{:}, ...
+    s = arrayfun(@bml.str.pval2marks, p, varargin{:}, ...
         'UniformOutput', false);
     return;
 end

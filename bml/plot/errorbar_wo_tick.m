@@ -1,10 +1,13 @@
-function [h, he] = errorbar_wo_tick(x, y, l, u, plot_args, tick_args, varargin)
+function [h, he] = errorbar_wo_tick(x, y, le, ue, plot_args, tick_args, varargin)
 % [h, he] = errorbar_wo_tick(x, y, le, ue, plot_args, tick_args, ...)
 % [h, he] = errorbar_wo_tick(x, y, e, [], plot_args, tick_args, ...)
+%
+% OPTIONS:
+% 'ax', gca
 
 % 2015-2016 Yul Kang. hk2699 at columbia dot edu.
 
-if nargin < 4 || isempty(u), u = l; l = -u; end
+if nargin < 4 || isempty(ue), ue = le; le = -ue; end
 if nargin < 5, plot_args = {}; end
 if nargin < 6, tick_args = {}; end
 
@@ -39,4 +42,4 @@ tick_args = varargin2plot(tick_args, ...
 h = plot(S.ax, x, y, plot_args{:});
 hold on;
 
-he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
+he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(le(:)), y(:) + ue(:)]', tick_args{:});
