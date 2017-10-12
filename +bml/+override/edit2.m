@@ -1,9 +1,13 @@
-function edit(obj, attr)
-% edit(obj, [meth])
-% edit('class', [meth])
-% edit(file)
+function edit2(obj, attr)
+% edit2(obj, [meth])
+% edit2('class', [meth])
+% edit2(file)
 %
 % 2015-2016 (c) Yul Kang. hk2699 at columbia dot edu.
+
+if nargin == 0
+    edit;
+end
 
 if exist('attr', 'var') && ~isempty(attr)
     if isobject(obj)
