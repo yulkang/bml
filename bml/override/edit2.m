@@ -5,4 +5,4 @@ function edit2(varargin)
 %
 % 2015-2016 (c) Yul Kang. hk2699 at columbia dot edu.
 
-bml.override.edit(varargin{:});
+bml.override.edit2(varargin{:});
