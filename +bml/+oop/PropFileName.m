@@ -250,13 +250,23 @@ methods
         S0_file = bml.str.Serializer.convert_from_S_file(S_file, ...
             PFile.file_fields, 'mult', PFile.file_mult);
     end
-    function S_file = convert_to_S_file(PFile, S0_file, varargin)
+    function [S_file, S] = convert_to_S_file(PFile, S0_file, varargin)
+        % S_file = convert_to_S_file(PFile, S0_file, varargin)
+        %
+        % 'file_fields', PFile.file_fields
+        % 'mult', PFile.file_mult
+        % 'leave_unmatched', true % false
+        %
         % TODO: Make consistent with get_S_file regarding cc and cmat
         S = varargin2S(varargin, {
-            'file_fields', PFile.file_fields
+            'file_fields', {}
             'mult', PFile.file_mult
             'leave_unmatched', true % false
             });
+        S.file_fields = bml.args.S2C2(varargin2S( ...
+            varargin2S(S.file_fields), ...
+            varargin2S(PFile.file_fields) ...
+            ));
         
         if ~isscalar(S0_file)
             S_file = arrayfun(@(S1) bml.str.Serializer.convert_to_S_file( ...
