@@ -133,6 +133,9 @@ methods
         name = PFile.get_file_name(add_fields, remove_fields);
         file = fullfile(PFile.root_data_dir, subdir, name);
     end
+    function d = get_dir(PFile)
+        d = fullfile(PFile.root_data_dir, PFile.subdir);
+    end
     function subdir = get.subdir(PFile)
         subdir = PFile.get_subdir;
     end
