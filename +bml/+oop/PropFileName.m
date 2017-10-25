@@ -352,12 +352,13 @@ end
 %% Figures
 methods
     function txt = get_title(W, args)
+        % txt = get_title(W, args)
         if ~exist('args', 'var')
             args = struct;
         end
         S_title = W.get_S_file(args);
         txt = bml.str.Serializer.convert(S_title);
-        txt = bml.str.wrap_text(strrep(txt, '_', '-'));
+        txt = bml.str.get_title(txt);
     end
     function [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, varargin)
         % [axs, files, titles] = imgather(W0, row_args, col_args, page_args, add_args, ...)
