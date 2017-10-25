@@ -10,6 +10,7 @@ ch = ch(incl);
 
 S = varargin2S(varargin, {
     'n_bin', min(9, numel(unique(x)))
+    'ax', gca
     'plot_args', {}
     });
 S.plot_args = varargin2plot(S.plot_args, {
@@ -25,5 +26,5 @@ incl_plot = n_all > 0;
 
 p_ch = n_ch ./ n_all;
 
-h = plot(x_plot(incl_plot), p_ch(incl_plot), S.plot_args{:});
+h = plot(S.ax, x_plot(incl_plot), p_ch(incl_plot), S.plot_args{:});
 end
