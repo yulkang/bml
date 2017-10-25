@@ -116,6 +116,7 @@ properties (Dependent)
 end
 methods
     function [file, name] = get_file_from_S0(PFile, S0, add_fields, remove_fields)
+        % get_file_from_S0(PFile, S0, add_fields, remove_fields)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         
@@ -126,6 +127,7 @@ methods
         [file, name] = PFile.get_file(add_fields, remove_fields);
     end
     function [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
+        % [file, name] = get_file(PFile, add_fields, remove_fields, subdir)
         if ~exist('add_fields', 'var'), add_fields = struct; end
         if ~exist('remove_fields', 'var'), remove_fields = {}; end
         if ~exist('subdir', 'var'), subdir = PFile.subdir; end
