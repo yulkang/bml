@@ -1,10 +1,10 @@
-function res = subsample(v, fac, d)
+function res = subsample(v, fac, dim)
 % subsample  subsample V by FAC along DIM.
 %
 % res = subsample(v, fac, [dim=1])
 
-if exist('d', 'var')
-    perm = [d, setdiff(1:ndims(v), d)];
+if nargin >= 3
+    perm = [dim, setdiff(1:ndims(v), dim)];
     
     v = permute(v, perm);
 end
@@ -21,6 +21,6 @@ end
 
 res = reshape(mean_rows(v, 1), siz);
 
-if exist('d', 'var')
+if nargin >= 3
     res = ipermute(res, perm);
 end
