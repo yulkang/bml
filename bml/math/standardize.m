@@ -16,6 +16,6 @@ if nargin < 2
 end
 
 avg = nanmean(src, dim);
-stdev = nanstd(src, dim);
+stdev = nanstd(src, [], dim);
 
 res = bsxfun(@rdivide, bsxfun(@minus, src, avg), stdev);

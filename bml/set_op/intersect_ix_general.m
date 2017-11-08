@@ -9,6 +9,12 @@ function [common_a, common_b] = intersect_ix_general(a, b, is_rows)
 %
 % 2015 (c) Yul Kang. hk2699 at cumc dot columbia dot edu.
 if is_rows
+    if isempty(a) || isempty(b)
+        common_a = [];
+        common_b = [];
+        return;
+    end
+    
     assert(ismatrix(a) && ismatrix(b) && size(a,2) == size(b, 2));
 
     na = size(a,1);
