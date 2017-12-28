@@ -25,3 +25,7 @@ for ii = 1:n_null
     delete(file);
     fprintf('Deleted %d/%d: %s\n', ii, n_null, file);
 end
+
+if n_null == 0
+    fprintf('No null file was found at %s\n', pth);
+end
