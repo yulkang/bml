@@ -274,7 +274,8 @@ methods (Static)
         end
         n = numel(files);
         
-        desc = S2s.fileparts(files);
+        desc = S2s.get_desc(files);
+%         [~,~,~,~,desc] = S2s.fileparts(files);
         
         incl = true(size(files));
         
@@ -309,6 +310,21 @@ methods (Static)
             pth = bml.file.filt2dir(filt);
             files = fullfile(pth, files);
         end
+    end
+    function desc = get_desc(file)
+        % desc = get_desc(file)
+        %
+        % desc: cell array of descriptor strings
+        %
+        % See also fileparts.
+        if iscell(file)
+            desc = cellfun(@bml.str.Serializer.get_desc, file, ...
+                'UniformOutput', false);
+            return;
+        end
+        
+        [~, nam] = fileparts(file);
+        desc = strsep_cell(nam, '+');
     end
     function strrep_in_dir(d)
         d = fullfile(d, '*.*');
@@ -455,11 +471,32 @@ end
 %% Internal - manipulate str
 methods
     function [S_file, pth, ext, name, desc] = fileparts(S2s, s)
-        % [desc, pth, ext, S_file, name] = fileparts(S2s, s)
+        % [S_file, pth, ext, name, desc] = fileparts(S2s, s)
         % desc: cell array of descriptor strings
+        %
+        % To get desc only, use get_desc instead (much faster).
+        %
+        % See also: get_desc
         if iscell(s)
-            [S_file, pth, ext, name, desc] = cellfun(@S2s.fileparts, s, ...
-                'UniformOutput', false);
+            n = numel(s);
+            siz = size(s);
+            S_file = cell(siz);
+            pth = repmat({''}, siz);
+            ext = pth;
+            name = pth;
+            desc = pth;
+            for ii = 1:n
+                try
+                    [S_file{ii}, pth{ii}, ext{ii}, name{ii}, desc{ii}] = ...
+                        S2s.fileparts(s{ii});
+                catch err
+                    warning(err_msg(err));
+                    
+                    continue;
+                end
+            end
+%             [S_file, pth, ext, name, desc] = cellfun(@S2s.fileparts, s, ...
+%                 'UniformOutput', false);
             return;
         end
         
@@ -509,7 +546,6 @@ methods
         end
     end
     function v = str2value(S2s, s)
-        s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
         if isempty(s)
             v = [];
         elseif all(ismember(strrep_cell(s, {
@@ -523,9 +559,31 @@ methods
             else
                 error('Not implemented yet!');
             end
-        elseif all(ismember(s, ['_', '0':'9', 'a':'z', 'A':'Z']))
+        elseif all(ismember(s, ['_', '0':'9', 'a':'z', 'A':'Z', '^']))
+            s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
             v = s;
         elseif s(1) == '{' && s(end) == '}'
+            if any(s == '[')
+                s = ['],', s(2:(end-1)), ',['];
+                s = strrep(s, '],[', '];[');
+                ix_sep = find(s == ';');
+                if any(s(ix_sep - 1) ~= ']') ...
+                        || any(s(ix_sep + 1) ~= '[')
+                	error(['Currently works only when all elements ' ...
+                           'of the cell array are vectors, ' ...
+                           'e.g., {[],[],[]}']);
+                end
+                
+                s = strrep(s, ',', ';');
+                ss = strsep_cell(s, ';');
+                ss = ss(2:(end-1));
+                n_sep = numel(ss);
+                v = cell(1, n_sep);
+                for ii = 1:n_sep
+                    v{ii} = S2s.str2value(ss{ii});
+                end
+                
+            else
 %             if all(ismember(s(2:(end-1)), ['_', '0':'9', 'a':'z', 'A':'Z', ',']))
                 s = [',', s(2:(end-1)), ','];
                 ix_sep = find(s == ',');
@@ -535,6 +593,7 @@ methods
                     v{ii} = S2s.str2value( ...
                         s((ix_sep(ii) + 1):(ix_sep(ii + 1) - 1)));
                 end
+            end
 %             else
 %                 error('Not implemented yet!');
 %             end
