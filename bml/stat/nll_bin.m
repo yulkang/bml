@@ -24,7 +24,7 @@ if S.normalize
     pred_pmf = max(pred_pmf, 0);
     sum_pred = sum(pred_pmf) + eps;
     pred_pmf = bsxfun(@times, pred_pmf + eps, ...
-        sum_pred ./ (sum_pred + eps + eps .* size(pred_pmf,1)));
+        sum_pred ./ (sum_pred + eps .* size(pred_pmf,1)));
 %         (pred_pmf + eps) ...
 %             .* (sum_pred ./ (sum_pred + eps .* numel(pred_pmf)));
 end
