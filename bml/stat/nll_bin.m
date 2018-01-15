@@ -20,11 +20,16 @@ S = varargin2S(varargin, {
 % obs_pmf  = obs_pmf(:);
 
 if S.normalize
-    % Make sure pred is positive, while preserving its sum.
-    pred_pmf = max(pred_pmf, 0);
-    sum_pred = sum(pred_pmf) + eps;
-    pred_pmf = bsxfun(@times, pred_pmf + eps, ...
-        sum_pred ./ (sum_pred + eps .* size(pred_pmf,1)));
+    % Make sure pred is positive and sums to 1 within each condition
+    pred_pmf = max(pred_pmf, 0) + eps;
+    pred_pmf = bsxfun(@rdivide, pred_pmf, sum(pred_pmf, 1));
+    
+% %     Make sure pred is positive, while preserving its sum.
+%     pred_pmf = max(pred_pmf, 0);
+%     sum_pred = sum(pred_pmf) + eps;
+%     pred_pmf = bsxfun(@times, pred_pmf + eps, ...
+%         sum_pred ./ (sum_pred + eps .* size(pred_pmf,1)));
+%
 %         (pred_pmf + eps) ...
 %             .* (sum_pred ./ (sum_pred + eps .* numel(pred_pmf)));
 end
