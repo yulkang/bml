@@ -8,12 +8,12 @@ function yhat = glmval_lapse(b, X0)
 
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
-bias = b(1);
-% offset = b(1);
+% bias = b(1);
+offset = b(1);
 beta = b(2:(end-1));
 lapse = invLogit(b(end));
 
-y0 = invLogit((X0 - bias) * beta);
-% y0 = invLogit(X0 * beta(:) + offset);
+% y0 = invLogit((X0 - bias) * beta);
+y0 = invLogit(X0 * beta(:) + offset);
 yhat = y0 * (1 - lapse) + 0.5 * lapse;
 
