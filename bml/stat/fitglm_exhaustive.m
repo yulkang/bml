@@ -24,7 +24,7 @@ function [mdl, info, mdls] = fitglm_exhaustive(X, y, glm_args, varargin)
 % 'must_include',    [] % Indices of columns of X to include.
 % 'must_exclude',    [] % Indices of columns of X to exclude.
 % 'crossval_args',   {}
-% 'UseParallel',     'model' % 'model'|'none'
+% 'UseParallel',     'auto' % 'auto'|'model'|'none'
 % 'verbose',         true
 % 'return_mdls',     (nargout >= 3)
 %
@@ -268,7 +268,7 @@ function [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
 
     switch model_criterion
         case 'crossval'
-            if verLessThan('matlab', '8.6')
+%             if verLessThan('matlab', '8.6')
                 glm_args1 = [glm_args(:)', ...
                     {'PredictorVars', find(param_incl)}];
                 [c_ic, c_ic0] = bml.stat.crossval_glmfit(X, y, glm_args1, ...
@@ -277,16 +277,16 @@ function [c_ic, c_ic0, c_mdl] = fitglm_unit(X, y, glm_args, param_incl, ...
                 % Take negative log likelihood
                 c_ic = -c_ic;
                 c_ic0 = -c_ic0;
-            else
-                glm_args1 = [glm_args(:)', ...
-                    {'PredictorVars',find(param_incl)}];
-                [c_ic, c_ic0] = bml.stat.crossval_glmfit(X, y, glm_args1, ...
-                    'group', group, crossval_args{:});
-
-                % Take negative log likelihood
-                c_ic = -c_ic;
-                c_ic0 = -c_ic0;
-            end
+%             else
+%                 glm_args1 = [glm_args(:)', ...
+%                     {'PredictorVars',find(param_incl)}];
+%                 [c_ic, c_ic0] = bml.stat.crossval_glmfit(X, y, glm_args1, ...
+%                     'group', group, crossval_args{:});
+% 
+%                 % Take negative log likelihood
+%                 c_ic = -c_ic;
+%                 c_ic0 = -c_ic0;
+%             end
             
         case 'none'
             c_ic = nan;
