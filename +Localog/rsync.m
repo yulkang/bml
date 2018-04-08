@@ -54,7 +54,7 @@ if S.filt_mode
     local = pth;
 end
 
-fmt.protocol = sprintf('yul@%s.shadlenlab.columbia.edu', S.remote);
+fmt.protocol = sprintf('yul@%s.shadlen.zi.columbia.edu', S.remote);
 cmd = {};
 
 switch op
@@ -119,5 +119,5 @@ end
 end
 
 function f = remote_full(d, local_full)
-f = strrep(local_full, fullfile(userhome,'Dropbox'), sprintf('yul@%s.shadlenlab.columbia.edu:~', d));
+f = strrep(local_full, fullfile(userhome,'Dropbox'), sprintf('yul@%s.shadlen.zi.columbia.edu:~', d));
 end
