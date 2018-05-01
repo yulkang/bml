@@ -92,6 +92,7 @@ methods (Static)
         %
         % S0 : struct with the original fields and values
         % S  : struct with shortened field names and multiplied values.
+        % C{i_pair, [orig, short]}: same as file_fields of ProfFileName.
         opt = varargin2S(varargin, {
             'mult', {}
             });
@@ -113,6 +114,7 @@ methods (Static)
         %
         % S  : struct with shortened field names and multiplied values.
         % S0 : struct with the original fields and values
+        % C{i_pair, [orig, short]}: same as file_fields of ProfFileName.
         opt = varargin2S(varargin, {
             'mult', {}
             });
