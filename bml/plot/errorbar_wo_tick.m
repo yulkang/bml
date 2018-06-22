@@ -12,7 +12,7 @@ plot_args = varargin2S(varargin2plot(plot_args, {
     'Marker', 'o'
     'MarkerSize', 8
     'LineStyle', 'none'
-    'LineWidth', 2
+    'LineWidth', 0.5
     'Color', 'k'
     'MarkerEdgeColor', 'w'
     }));
@@ -32,7 +32,7 @@ tick_args = varargin2plot(tick_args, ...
         }), {
         'Marker', 'none'
         'LineStyle', '-'
-        'LineWidth', 0.5
+        'LineWidth', 1
         'Color', 'k'
         }));
     
