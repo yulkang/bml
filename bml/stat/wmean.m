@@ -1,7 +1,7 @@
 function m = wmean(v, w, varargin)
 % Weighted mean. W is expanded to match v's dimension, and vice versa.
 %
-% m = wmean(v, w, varargin)
+% m = wmean(v, w, [dim])
 %
 % See also: reshape2vec, nanwmean
 %
