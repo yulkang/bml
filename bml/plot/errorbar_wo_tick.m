@@ -36,7 +36,7 @@ tick_args = varargin2plot(tick_args, ...
         'Color', 'k'
         }));
     
-h = plot(S.ax, x, y, plot_args{:});
+he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
 hold on;
 
-he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
+h = plot(S.ax, x, y, plot_args{:});
