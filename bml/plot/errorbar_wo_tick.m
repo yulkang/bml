@@ -12,13 +12,14 @@ plot_args = varargin2S(varargin2plot(plot_args, {
     'Marker', 'o'
     'MarkerSize', 8
     'LineStyle', 'none'
-    'LineWidth', 0.5
+    'LineWidth', 0.75
     'Color', 'k'
     'MarkerEdgeColor', 'w'
     }));
 
 S = varargin2S(varargin, {
     'ax', gca
+    'tick_above_marker', true
     });
 
 if ~isfield(plot_args, 'MarkerFaceColor')
@@ -36,7 +37,12 @@ tick_args = varargin2plot(tick_args, ...
         'Color', 'k'
         }));
     
-he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
-hold on;
-
-h = plot(S.ax, x, y, plot_args{:});
+if S.tick_above_marker
+    h = plot(S.ax, x, y, plot_args{:});
+    hold on;
+    he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
+else
+    he = plot(S.ax, [x(:), x(:)]', [y(:) - abs(l(:)), y(:) + u(:)]', tick_args{:});
+    hold on;
+    h = plot(S.ax, x, y, plot_args{:});
+end
