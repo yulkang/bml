@@ -6,10 +6,17 @@ function hgl = gltitle(h, op, t, varargin)
 % h     : Array of axes
 % op    : 'all', 'row', 'col'
 % t     : Title. In case of 'all', a string. In case of 'row' or 'col', a cell array of strings.
-% shift : [xshift, yshift] or [xshift, yshift, zshift]. Defaults to [0.05, -0.05].
+%
+% OPTIONS:
+% 'shift', [0.05, -0.05] % [xshift, yshift] or [xshift, yshift, zshift]. Defaults to [0.05, -0.05].
+% 'title_args', {
+%     'FontSize',     fntsiz + 8 % or 5
+%     'Position',     [0.5, 1.06, 0.5] % [x, y, z]
+%     }
 
+ 
 S = varargin2S(varargin, {
-    'shift', [0.05, -0.05]
+    'shift', [0.05, -0.05] % [xshift, yshift] or [xshift, yshift, zshift]. Defaults to [0.05, -0.05].
     'title_args', {}
     });
 
@@ -24,7 +31,7 @@ switch op
     case 'all'
         C = varargin2C(S.title_args, {
             'FontSize',     fntsiz + 8
-            'Position',     [0.5, 1.06, 0.5]
+            'Position',     [0.5, 1.06, 0.5] % [x, y, z]
             });
         
         hgl = glaxes(h, 'title', t, C{:});
