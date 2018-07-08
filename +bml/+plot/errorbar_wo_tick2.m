@@ -1,9 +1,9 @@
 function [h, hxe, hye] = errorbar_wo_tick2(x, y, xl, xu, yl, yu, plot_args, tick_args, varargin)
 % [h, hxe, hye] = errorbar_wo_tick2(x, y, xle, xue, yle, yue, plot_args, tick_args, ...)
-% [h, hxe, hye] = errorbar_wo_tick2(x, y, xe, [], ye, plot_args, tick_args, ...)
+% [h, hxe, hye] = errorbar_wo_tick2(x, y, xe, [], ye, [], plot_args, tick_args, ...)
 % : Errorbars along both x and y axes.
 %
-% [h, hxe] = errorbar_wo_tick2(x, y, xe, [], [], plot_args, tick_args, ...)
+% [h, hxe] = errorbar_wo_tick2(x, y, xe, [], [], [], plot_args, tick_args, ...)
 % : Errorbar along x-axis only.
 %
 % See also: bml.plot.errorbar_wo_tick
