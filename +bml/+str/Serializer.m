@@ -556,11 +556,15 @@ methods
                 }), ['-', '.', '0':'9', ',']))
             v = eval(['[', s, ']']);
         elseif s(1) == '[' && s(end) == ']'
+            s = strrep(s, '^', '.');
             if all(ismember(s(2:(end-1)), ['-', '.', '0':'9', ',']))
                 v = eval(s);
             else
                 error('Not implemented yet!');
             end
+        elseif all(ismember(s, ['0':'9', '^']))
+            s = strrep(s, '^', '.');
+            v = eval(s);
         elseif all(ismember(s, ['_', '0':'9', 'a':'z', 'A':'Z', '^']))
             s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
             v = s;
