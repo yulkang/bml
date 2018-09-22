@@ -7,6 +7,7 @@ function [p_min, p_1st] = min_distrib(p, sum_equals)
 %
 % p_min(t,1,:): Probability distribution of min(t_1 ~ p(:,1), t_2 ~ p(:,2))
 % p_1st(t,k,:): Probability of t_k happening first at t.
+%               sums(p_1st, [1, 2]) gives all 1's.
 %
 % sum_mode
 % 'prod' (default)

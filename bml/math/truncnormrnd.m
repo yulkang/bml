@@ -8,7 +8,7 @@ function [r, plo, pup, p] = truncnormrnd(mu, sig, lb, ub, siz)
 % See also truncnormrnd_constparam
 %
 % 2015 (c) Yul Kang. hk2699 at columbia dot edu.
-[mu, sig, lb, ub] = rep2match(mu, sig, lb, ub);
+[mu, sig, lb, ub] = rep2match({mu, sig, lb, ub});
 if nargin < 5
     siz = size(mu);
 end

@@ -31,52 +31,56 @@ if ishandle(vh)
 else
     ax = gca;
 end 
-
-if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
-        && ((length(varargin) <= 1) || isnumeric(varargin{1}))
-    
-    if isempty(varargin)
-        v = 0;
-    else
-        v = varargin{1};
-    end
-    if isscalar(v) && v == 0
-        if numel(varargin) < 2
-            plot_opt = {};
-        else
-            plot_opt = varargin2plot(parsePlotSpec(varargin(2)));
-        end
-        
-        try
-            switch vh
-                case 'h'
-                    ax.YBaseline.Visible = 'on';
-                    ax.YBaseline.BaseValue = v;
-                    
-                    if ~isempty(plot_opt)
-                        set(ax.YBaseline, plot_opt{:});
-                    end
-
-                case 'v'
-                    ax.XBaseline.Visible = 'on';
-                    ax.XBaseline.BaseValue = v;
-                    
-                    if ~isempty(plot_opt)
-                        set(ax.XBaseline, plot_opt{:});
-                    end
-            end
-            return;
-        catch err
-            warning(err_msg(err));
-        end
-    end
-end
+% 
+% if ~verLessThan('matlab', '8.5') && (strcmp(vh, 'h') || strcmp(vh, 'v')) ...
+%         && ((length(varargin) <= 1) || isnumeric(varargin{1}))
+%     
+%     if isempty(varargin)
+%         v = 0;
+%     else
+%         v = varargin{1};
+%     end
+%     if isscalar(v) && v == 0
+%         if numel(varargin) < 2
+%             plot_opt = {};
+%         else
+%             plot_opt = varargin2plot(parsePlotSpec(varargin(2)));
+%         end
+%         
+%         try
+%             switch vh
+%                 case 'h'
+%                     ax.YBaseline.Visible = 'on';
+%                     ax.YBaseline.BaseValue = v;
+%                     
+%                     if ~isempty(plot_opt)
+%                         set(ax.YBaseline, plot_opt{:});
+%                     end
+% 
+%                     varargout{1} = ax.YBaseline;
+%                     
+%                 case 'v'
+%                     ax.XBaseline.Visible = 'on';
+%                     ax.XBaseline.BaseValue = v;
+%                     
+%                     if ~isempty(plot_opt)
+%                         set(ax.XBaseline, plot_opt{:});
+%                     end
+%                     
+%                     varargout{1} = ax.XBaseline;
+%             end
+%             return;
+%         catch err
+%             warning(err_msg(err));
+%         end
+%     end
+% end
 
 %% Save xlim and ylim
 xLim0 = xlim(ax);
 yLim0 = ylim(ax);
-xLim = [-1,1] * 1e10;
-yLim = [-1,1] * 1e10;
+xLim = [-1,1] * max(1e5, max(abs(xLim0)));
+yLim = [-1,1] * max(1e5, max(abs(xLim0)));
 
 hold0 = get(ax, 'NextPlot');
 hold(ax, 'on');
@@ -106,6 +110,9 @@ for ii = 1:2:length(varargin)
         case {'NW', 'SE'}
             x = [min(xLim(1), yLim(1)); max(xLim(2), yLim(2))];
             y = bsxfun(@plus, -x, varargin{ii}(:)');
+            
+        otherwise
+            error('Unsupported kind=%s', vh);
     end
     
     %% Spec

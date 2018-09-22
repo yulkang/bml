@@ -12,7 +12,7 @@ function ax = subplot_by_pos(fig, tol)
 % Yul Kang (c) 2016. hk2699 at columbia dot edu.
 
 if nargin < 1, fig = gcf; end
-if nargin < 2, tol = 1e-6; end
+if nargin < 2, tol = 1e-3; end
 
 %%
 ax0 = findobj(fig, 'Type', 'Axes');

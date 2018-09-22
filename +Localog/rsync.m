@@ -15,7 +15,7 @@ function cmd = rsync(op, local, varargin)
 % 'verbose',  true
 
 S = varargin2S(varargin, {
-    'remote',   'pat' % 'gpu'
+    'remote',   'metheny' % 'pat' % 'gpu'
     'opt',      '-avz -e ssh'
     'exclude',  '' % default, bak, code
     'cmd_only', false
@@ -28,8 +28,12 @@ S = varargin2S(varargin, {
 if isempty(S.exclude)
     S.exclude = 'default';
 end
+exclude_file = fullfile(fileparts(mfilename('fullpath')), ...
+    sprintf('rsync_exclude_%s.txt', S.exclude));
+
 S.opt = [S.opt, ' ', sprintf('--exclude-from "%s"', ...
-    DIR_('CODE', sprintf('Bash/rsync_exclude/%s.txt', S.exclude)))];
+    exclude_file)];
+%     DIR_('CODE', sprintf('Bash/rsync_exclude/%s.txt', S.exclude)))];
 
 if nargin < 2 
     local = 'Data';

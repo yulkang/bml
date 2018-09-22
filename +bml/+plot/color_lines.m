@@ -4,12 +4,8 @@ function color = color_lines(desc)
 %       'yellow'|'y'|'orange'|'o', 'purple'|'p', 'green'|'g',
 %       'cyan'|'c', 'red'|'r'
 
-if ~isscalar(desc)
-    if ischar(desc)
-        color = arrayfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
-    else
-        color = cellfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
-    end
+if iscell(desc)
+    color = cellfun(@bml.plot.color_lines, desc, 'UniformOutput', false);
     color = cell2mat2(color(:));
     return;
 end

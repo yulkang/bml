@@ -41,6 +41,12 @@ properties
     en_cell = '}';
     sep_cell = ',';
     
+    % replace_pair{k,1} in value is replaced with {k,2} in string,
+    % and vice versa.
+    replace_pair = {
+        '.', '^'
+        };
+    
     skip_fields_with_error = true;
     skip_empty = true;
 end
@@ -402,7 +408,8 @@ methods
                     S2s.en_mat
                     ];
             end
-        end        
+        end
+        str_v = strrep_cell(str_v, S2s.replace_pair);
     end
     function str = struct2str(S2s, S)        
 %         if isequal(S2s.fields, [])
@@ -447,17 +454,20 @@ methods
 end
 %% Internal - manipulate str
 methods
-    function [desc, pth, ext] = fileparts(S2s, s)
-        % [desc, pth, ext] = fileparts(S2s, s)
+    function [S_file, pth, ext, name, desc] = fileparts(S2s, s)
+        % [desc, pth, ext, S_file, name] = fileparts(S2s, s)
         % desc: cell array of descriptor strings
         if iscell(s)
-            [desc, pth, ext] = cellfun(@S2s.fileparts, s, ...
+            [S_file, pth, ext, name, desc] = cellfun(@S2s.fileparts, s, ...
                 'UniformOutput', false);
             return;
         end
         
         [pth, name, ext] = fileparts(s);
-        desc = S2s.strsep(name);
+        S_file = S2s.convert(name);
+        if nargout >= 5
+            desc = S2s.strsep(name);
+        end
     end
     function compo = strsep(S2s, s)
         if iscell(s)
@@ -466,6 +476,12 @@ methods
         end
         
         compo = strsep2C(s, S2s.sep_fields);
+    end
+    function file = fullfile(S2s, pth, S_file, ext)
+        if ~exist('ext', 'var')
+            ext = '';
+        end
+        file = fullfile(pth, [S2s.convert(S_file), ext]);
     end
 end
 %% Internal - str to objects
@@ -493,9 +509,13 @@ methods
         end
     end
     function v = str2value(S2s, s)
+        s = strrep_cell(s, S2s.replace_pair(:, [2 1]));
         if isempty(s)
             v = [];
-        elseif all(ismember(s, ['-', '.', '0':'9', ',']))
+        elseif all(ismember(strrep_cell(s, {
+                'NaN', '0'
+                'Inf', '0'
+                }), ['-', '.', '0':'9', ',']))
             v = eval(['[', s, ']']);
         elseif s(1) == '[' && s(end) == ']'
             if all(ismember(s(2:(end-1)), ['-', '.', '0':'9', ',']))

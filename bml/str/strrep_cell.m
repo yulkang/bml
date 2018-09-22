@@ -34,6 +34,10 @@ if isscalar(s2), s2 = repmat(s2, [1, n]); end
 
 % Run strrep
 for ii = 1:n
+    if iscell(c)
+        c(cellfun(@isempty, c)) = {''};
+    end
+    
     if ~S.wholeStringOnly
         % Find substring, too.
         c = strrep(c, s1{ii}, s2{ii});

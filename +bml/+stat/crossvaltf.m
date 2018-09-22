@@ -30,6 +30,20 @@ switch meth
     case 'Kfold'
         error('Not implemented yet!');
         
+    case 'KfoldMod'
+        % According to mod(1:n_in_group, n_sim). Not random.
+        n_group = max(group);
+        rel_in_group = zeros(n_tr, 1);
+        for i_group = 1:n_group
+            in_group = group == i_group;
+            n_in_group = nnz(in_group);
+            rel_in_group(in_group) = mod((1:n_in_group)' - 1, n_sim) + 1;
+        end
+        for i_sim = 1:n_sim
+            test(:,i_sim) = rel_in_group == i_sim;
+            train(:,i_sim) = ~test(:,i_sim);
+        end        
+        
     case 'KfoldConsec'
         n_group = max(group);
         rel_in_group = zeros(n_tr, 1);
@@ -54,5 +68,5 @@ switch meth
         end
         
     otherwise
-        error('Not implemented yet!');
+        error('Not implemented yet: %s', meth);
 end

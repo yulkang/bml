@@ -24,7 +24,7 @@ try
 catch err
     [v, ind] = max(abs(dif(:)));
     
-    [a, b] = rep2match(a, b);
+    [a, b] = rep2match({a, b});
     
     sub = bml.matrix.ind2sub_mat(size(a), ind);
     fprintf('Max |a - b| at (');
