@@ -29,5 +29,5 @@ end
 
 varargout = cell(1,n);
 for ii = 1:n
-    varargout{ii} = bml.matrix.rep2fit(inp{ii}, siz, S.dim);
+    varargout{ii} = bml.matrix.rep2fit(inp{ii}, siz);
 end

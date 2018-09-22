@@ -1,4 +1,4 @@
-function varargout = strsep(s, sep, ix)
+function varargout = strsep(s, sep, ix, toCell)
 % STRSEP  Separates string into components and returns varargout
 %
 % varargout = strsep(s, sep='_', ix, toCell=false)
@@ -51,6 +51,9 @@ function varargout = strsep(s, sep, ix)
 % See also fullstr.
 
 if ~exist('sep', 'var'), sep = '_'; end
+if nargin < 4
+    toCell = false;
+end
 
 if ischar(s)
     varargout = separate_str(s, sep);
@@ -74,20 +77,26 @@ else
 end
 
 if exist('ix', 'var') 
-    if isequal(ix, 'c')
-        varargout{1} = varargout;
-        varargout(2:end) = [];
-    elseif ~ischar(ix) || ~isequal(ix, ':')
-        ix(ix <= 0) = length(varargout) + ix(ix <= 0);
-        varargout = varargout(ix); 
+    if ~ischar(ix) && ~isequal(ix, ':')
+        varargout = varargout(ix);
     end
+%     if isequal(ix, 'c')
+%         varargout{1} = varargout;
+%         varargout(2:end) = [];
+%     elseif ~ischar(ix) || ~isequal(ix, ':')
+%         ix(ix <= 0) = length(varargout) + ix(ix <= 0);
+%         varargout = varargout(ix); 
+%     end
 end
-
-if length(varargout) < nargout
-    if ischar(s)
-        varargout((length(varargout)+1):nargout) = {''};
-    else % iscell(s)
-        varargout((length(varargout)+1):nargout) = {cell(size(s))};
+if toCell
+    varargout = {varargout};
+else
+    if length(varargout) < nargout
+        if ischar(s)
+            varargout((length(varargout)+1):nargout) = {''};
+        else % iscell(s)
+            varargout((length(varargout)+1):nargout) = {cell(size(s))};
+        end
     end
 end
 end
