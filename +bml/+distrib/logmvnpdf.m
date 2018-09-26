@@ -14,4 +14,9 @@ if nargin < 3
     sigma = eye(d);
 end
 
-l = -log((2 * pi).^d * det(sigma)) / 2 - (x - mu) / sigma * (x - mu)' / 2;
+n = size(x, 1);
+l = zeros(n, 1);
+z = -log((2 * pi).^d * det(sigma)) / 2;
+for ii = 1:size(x, 1)
+    l(ii) = z - (x(ii,:) - mu) / sigma * (x(ii,:) - mu)' / 2;
+end
