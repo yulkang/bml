@@ -70,8 +70,12 @@ for i_row = 1:n_row
                + sum(S.btw_row(i_row:(n_row - 1))) ...
                + sum(height((i_row + 1):n_row));
         
-        set(ax(i_row, i_col), ...
-            'Position', [left, bottom, width(i_col), height(i_row)]);
+        try
+            set(ax(i_row, i_col), ...
+                'Position', [left, bottom, width(i_col), height(i_row)]);
+        catch err
+            warning(err_msg(err));
+        end
     end
 end
 end
