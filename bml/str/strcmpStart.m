@@ -8,6 +8,15 @@ function [tf, res_str] = strcmpStart(starting_str, containing_str)
 %
 % res_str = containing_str(tf)
 %
+% Example:
+% >> strcmpStart({'a', 'ab'}, {'a', 'ab', 'abc', 'bab'})
+% ans =
+%   2×4 logical array
+%    1   1   1   0
+%    0   1   1   0
+%
+% See also: strcmpFirst, strcmpFirsts
+
 % 2015 (c) Yul Kang. yul dot kang dot on at gmail.
 
 if ~iscell(starting_str)

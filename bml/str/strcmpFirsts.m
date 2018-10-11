@@ -13,7 +13,7 @@ function res = strcmpFirsts(a, b, varargin)
 %      1     1     1     0
 %      0     1     1     0
 %
-% See also: strcmpFirst
+% See also: strcmpFirst, strcmpStart
 %
 % 2015 (c) Yul Kang. yul dot kang dot on at gmail.
 assert(iscell(a) && iscell(b));

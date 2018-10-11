@@ -7,7 +7,7 @@ function varargout = strsep(s, sep, ix, toCell)
 % sep : Separaters. sep can have multiple characters. Each character will be considered as a seprator.
 % ix  : Which inputs will be returned. ix<=0 will be counted from the last one. 
 %       ':' will give all.
-%       'c' will give all in a single cell array.
+% toCell: if true, give all outputs in one cell array.
 %
 % Superfluous varargout will be assigned ''.
 %
@@ -51,6 +51,9 @@ function varargout = strsep(s, sep, ix, toCell)
 % See also fullstr.
 
 if ~exist('sep', 'var'), sep = '_'; end
+if nargin < 3
+    ix = ':';
+end
 if nargin < 4
     toCell = false;
 end
@@ -76,17 +79,8 @@ else
     error('Give only string or cell inputs!');
 end
 
-if exist('ix', 'var') 
-    if ~ischar(ix) && ~isequal(ix, ':')
-        varargout = varargout(ix);
-    end
-%     if isequal(ix, 'c')
-%         varargout{1} = varargout;
-%         varargout(2:end) = [];
-%     elseif ~ischar(ix) || ~isequal(ix, ':')
-%         ix(ix <= 0) = length(varargout) + ix(ix <= 0);
-%         varargout = varargout(ix); 
-%     end
+if ~(ischar(ix) && isequal(ix, ':'))
+    varargout = varargout(ix);
 end
 if toCell
     varargout = {varargout};

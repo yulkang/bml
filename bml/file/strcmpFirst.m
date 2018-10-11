@@ -21,7 +21,7 @@ function res = strcmpFirst(a, b, varargin)
 % ans =
 %      0     1     1
 %
-% See also: strcmpFirsts, str, PsyLib
+% See also: strcmpFirsts, strcmpStart, str, PsyLib
 %
 % 2014 (c) Yul Kang. See help PSYLIB for the license.
 
