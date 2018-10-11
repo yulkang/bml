@@ -29,6 +29,11 @@ S = varargin2S(varargin, {
     'col_rel', [] % if nonempty, assigns relative width of each column.
     'row_rel', [] % if nonempty, assigns relative height of each row.
     });
+
+if nargin < 1 || isempty(ax)
+    ax = bml.plot.subplot_by_pos;
+end
+
 n_row = size(ax, 1);
 n_col = size(ax, 2);
 
