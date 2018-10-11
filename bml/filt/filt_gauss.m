@@ -16,7 +16,7 @@ function [f, n, x] = filt_gauss(sig, w)
 % s = double(t == 0);
 % ss = conv(s,f,'same');
 % plot(t,s,t,ss);
-%
+
 % 2015 (c) Yul Kang. hk2699 at cumc dot columbia dot edu.
 
 if nargin < 2, w = 6; end

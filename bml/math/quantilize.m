@@ -43,26 +43,42 @@ end
 
 %% 
 if isscalar(n)
-    if n == 2
-        boundary = median(src, dim);
-    else
-        boundary = quantile(src, n-1, dim);
+%     if n == 2
+%         boundary = median(src, dim);
+%     else
+%         boundary = quantile(src, n-1, dim);
+%     end
+
+    n_dat = numel(src);
+    [sorted, ix] = sort(src);
+    dst      = zeros(size(src));
+    
+    ix_boundary = floor(n_dat * (1:n) / n);
+    boundary = sorted(ix_boundary(1:(end-1)));
+    
+    rnk = zeros(size(ix));
+    rnk(ix(:)') = 1:n_dat;
+    
+    for ii = 1:n
+        incl = (rnk > n_dat * (ii - 1) / n) ...
+            & (rnk <= n_dat * ii / n);
+        dst( incl ) = ii;
     end
 else
-    boundary = n;
+    boundary = n; % boundary vector
     n = length(boundary) + 1;
+    
+    cIncl    = true(size(src));
+    dst      = zeros(size(src));
+
+    for ii = 1:(n-1)
+     newIncl = cIncl & (src <= boundary(ii));
+     dst(newIncl) = ii;
+     cIncl(newIncl) = false;
+    end
+    dst(cIncl) = n;
 end
 
-cIncl    = true(size(src));
-dst      = zeros(size(src));
-
-for ii = 1:(n-1)
- newIncl = cIncl & (src <= boundary(ii));
- dst(newIncl) = ii;
- cIncl(newIncl) = false;
-end
-
-dst(cIncl) = n ;
 notnan = ~isnan(src);
 
 if nargout >= 3

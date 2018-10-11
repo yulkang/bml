@@ -9,12 +9,17 @@ function [ax_dst_new, h] = openfig_to_axes(file, ax_dst, varargin)
 
 % 2016 Yul Kang. hk2699 at columbia dot edu.
 
+S = varargin2S(varargin, {
+    'ix_axes_to_load', ':'
+    });
+
 [~,~,ext] = fileparts(file);
 if isempty(ext), file = [file, '.fig']; end
 loadedfig = openfig(file, 'invisible');
 
 ax_src = bml.plot.subplot_by_pos(loadedfig);
 % ax_src = findobj(loadedfig, 'Type', 'Axes');
+ax_src = ax_src(S.ix_axes_to_load);
 n_ax = numel(ax_src);
 
 for i_ax = n_ax:-1:1

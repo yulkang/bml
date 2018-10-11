@@ -15,7 +15,7 @@ function cmd = rsync(op, local, varargin)
 % 'verbose',  true
 
 S = varargin2S(varargin, {
-    'remote',   'metheny' % 'pat' % 'gpu'
+    'remote',   'pat' % 'pat' % 'gpu'
     'opt',      '-avz -e ssh'
     'exclude',  '' % default, bak, code
     'cmd_only', false
@@ -54,7 +54,7 @@ if S.filt_mode
     local = pth;
 end
 
-fmt.protocol = sprintf('yul@%s.shadlenlab.columbia.edu', S.remote);
+fmt.protocol = sprintf('yul@%s.shadlen.zi.columbia.edu', S.remote);
 cmd = {};
 
 switch op
@@ -119,5 +119,5 @@ end
 end
 
 function f = remote_full(d, local_full)
-f = strrep(local_full, fullfile(userhome,'Dropbox'), sprintf('yul@%s.shadlenlab.columbia.edu:~', d));
+f = strrep(local_full, fullfile(userhome,'Dropbox'), sprintf('yul@%s.shadlen.zi.columbia.edu:~', d));
 end

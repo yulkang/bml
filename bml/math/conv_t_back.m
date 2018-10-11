@@ -1,4 +1,6 @@
 function v = conv_t_back(v, flt)
+% v = conv_t_back(v, flt)
+%
 % Convolves v in the reverse time direction.
 % Gives more weight to v in the earlier time, so that the 
 % convolved area always sum to sum(flt), even when the filter is truncated at 0.

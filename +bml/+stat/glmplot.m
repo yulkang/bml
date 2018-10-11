@@ -12,12 +12,22 @@ S_plot = varargin2S(plot_args, {
     'Solid', true
     'LineStyle', '-'
     });
+plot_args = varargin2plot(plot_args, {
+    'MarkerFaceColor', S_plot.Color
+    'MarkerEdgeColor', 'w'
+    'Color', S_plot.Color
+    });
 
 res = glmwrap(X, y, distr, glm_args{:});
 
 switch distr
     case 'binomial'
         assert(size(X, 2) == 1, 'Only one IV is supported now!');
+        
+        incl = ~isnan(X(:,1)) & ~isnan(y);
+        X = X(incl,:);
+        y = y(incl,:);
+        
         [xs_data,~,ix] = unique(X(:,1));
         
         assert(islogical(y));
@@ -30,20 +40,23 @@ switch distr
             'Color', S_plot.Color);
         hold on;
         
-        if S_plot.Solid
-            C = {
-                'MarkerFaceColor', S_plot.Color, ...
-                'MarkerEdgeColor', 'w'
-                };
-        else
-            C = {
-                'MarkerFaceColor', 'w', ...
-                'MarkerEdgeColor', S_plot.Color
-                };
-        end
+        h.data = bml.stat.plot_binned_ch(X, y, ...
+            'plot_args', plot_args);
         
-        h.data = plot(xs_data, p, 'o', C{:});
-        hold off;
+%         if S_plot.Solid
+%             C = {
+%                 'MarkerFaceColor', S_plot.Color, ...
+%                 'MarkerEdgeColor', 'w'
+%                 };
+%         else
+%             C = {
+%                 'MarkerFaceColor', 'w', ...
+%                 'MarkerEdgeColor', S_plot.Color
+%                 };
+%         end
+%         
+%         h.data = plot(xs_data, p, 'o', C{:});
+%         hold off;
         
     otherwise
         error('distr=%s is not supported yet!', distr);

@@ -306,6 +306,9 @@ methods
         
         for f = fs
             c = S_batch.(f{1});
+            if isempty(c)
+                continue;
+            end
             if iscell(c) && all(cellfun(@ischar, c))
                 strs = c;
             elseif iscell(c)

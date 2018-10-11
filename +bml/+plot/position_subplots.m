@@ -75,11 +75,10 @@ for i_row = 1:n_row
                + sum(S.btw_row(i_row:(n_row - 1))) ...
                + sum(height((i_row + 1):n_row));
         
-        try
-            set(ax(i_row, i_col), ...
+        ax1 = ax(i_row, i_col);
+        if isa(ax1, 'matlab.graphics.axis.Axes')
+            set(ax1, ...
                 'Position', [left, bottom, width(i_col), height(i_row)]);
-        catch err
-            warning(err_msg(err));
         end
     end
 end

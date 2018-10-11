@@ -42,7 +42,8 @@ elseif ischar(S.lim_from)
 
         case 'markers'
             hs = bml.plot.figure2struct(S.ax);
-            coord = cell2vec(get(hs.marker, [upper(S.xy), 'Data']));
+            hs1 = setdiff(hs.marker, hs.segment);
+            coord = cell2vec(get(hs1, [upper(S.xy), 'Data']));
 
         case 'lim'
             switch S.xy
