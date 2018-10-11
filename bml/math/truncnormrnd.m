@@ -9,7 +9,7 @@ function [r, plo, pup, p] = truncnormrnd(mu, sig, lb, ub, siz)
 %
 % 2015 (c) Yul Kang. hk2699 at columbia dot edu.
 [mu, sig, lb, ub] = rep2match({mu, sig, lb, ub});
-if nargin < 5
+if nargin < 5 || isempty(siz)
     siz = size(mu);
 end
 assert(all(sig >= 0));
