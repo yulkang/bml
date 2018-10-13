@@ -20,7 +20,8 @@ plo = normcdf(lb, mu, sig);
 pup = normcdf(ub, mu, sig);
 p   = bsxfun(@plus, bsxfun(@times, pup - plo, r), plo);
 
-if (size(p,1) > 1) && (size(mu,1) == 1) && (size(sig,1) == 1)
+if (size(p,1) > 1) && (size(mu,1) == 1) && (size(sig,1) == 1) ...
+        && ((size(mu,2) > 1) || (size(sig,2) > 1))
     n_param = size(p, 2);
     for i_param = 1:n_param
         if sig(i_param) == 0
