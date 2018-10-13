@@ -22,7 +22,9 @@ for ii = 1:length(varargin)
     
     if isnumeric(val)
         if size(val,1) == 1
-            fprintf('%1.3g\n', val);
+%             fprintf('%1.3g\n', val);
+            disp(val);
+            fprintf('\n');
         else
             fprintf('\n');
             disp(val);
