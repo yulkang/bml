@@ -1,6 +1,6 @@
 function [r, plo, pup, p] = truncnormrnd(mu, sig, lb, ub, siz)
 % [r, plo, pup, p] = truncnormrnd(mu, sig, lb, ub, siz)
-% Correctly handles sig == 0 and sig == eps.
+% Correctly handles sig == 0, sig == eps, lb=-inf, and/or ub=inf.
 %
 % When giving multiple mu, sig, lb, and ub, try giving them as a row vector,
 % and specify siz as [n_samp x n_param]. That may be faster.
