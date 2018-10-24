@@ -6,13 +6,13 @@ function cmap = colormap_diverge(n, colors)
 %
 % cmap: n x 3 matrix.
 
-if nargin < 1
+if nargin < 1 || isempty(n)
     n = 256;
 else
     assert(isscalar(n));
     assert(n > 0);
 end
-if nargin < 2
+if nargin < 2 || isempty(colors)
     colors = [
         0, 0, 1
         1, 1, 1
