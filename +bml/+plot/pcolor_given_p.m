@@ -1,5 +1,5 @@
-function c = pcolor_given_p(p, colors)
-% c = pcolor_given_p(p, colors)
+function c = pcolor_given_p(p, colors, scale)
+% c = pcolor_given_p(p, colors, scale = sum(p, 3))
 %
 % p(x,y,k)
 % colors(k,rgb)
@@ -13,7 +13,12 @@ siz0 = size(p);
 c = zeros([siz0(1:2), n_color_elem]);
 
 p = max(p, eps);
-p = bsxfun(@rdivide, p, sum(p, 3));
+
+if nargin < 3 || isempty(scale)
+    scale = sum(p, 3);
+end
+
+p = min(bsxfun(@rdivide, p, scale), 1);
 
 for ii = 1:n_color_elem
     c(:,:,ii) = sum(bsxfun(@times, p, ...
