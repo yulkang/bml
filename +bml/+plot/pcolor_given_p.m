@@ -18,7 +18,7 @@ if nargin < 3 || isempty(scale)
     scale = sum(p, 3);
 end
 
-p = min(bsxfun(@rdivide, p, scale), 1);
+p = max(min(bsxfun(@rdivide, p, scale), 1), 0);
 
 for ii = 1:n_color_elem
     c(:,:,ii) = sum(bsxfun(@times, p, ...
