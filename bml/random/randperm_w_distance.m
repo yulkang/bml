@@ -24,7 +24,8 @@ n = numel(id);
 
 assert(isscalar(min_dist));
 assert(min_dist >= 1);
-assert(n_id >= min_dist);
+assert(n_id >= min_dist, 'n_id=%d must be >= min_dist=%d', ...
+    n_id, min_dist);
 
 ix0 = (1:n)';
 ix = (1:n)';
