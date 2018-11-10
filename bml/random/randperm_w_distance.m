@@ -1,26 +1,31 @@
-function [id, ix, i_attempt] = randperm_w_distance(id, min_dist)
-% [id, ix, i_attempt] = randperm_w_distance(id, min_dist)
+function [ix, id, i_attempt] = randperm_w_distance(id, min_dist, k)
+% [ix, id, i_attempt] = randperm_w_distance(id, min_dist, k)
 %
 % id: vector of unique natural numbers from 1:numel(unique(id)).
 % min_dist: scalar minimum distance. 1 allows the same contiguous ids.
+% k: number of items to choose. See randperm.
 %
-% id: permuted ID.
 % ix: permuted order.
+% id: permuted ID.
 % i_attempt: number of attempts made.
 %
-% See also: same_within
+% See also: same_within, randperm
 %
 % 2018 (c) Yul Kang. yul dot kang dot on at gmail.
 
 n_attempt = 100;
 
 assert(isvector(id));
-siz0 = size(id);
-id = id(:);
-% id0 = id;
+is_row = isrow(id);
+if ~is_row
+    id = id(:);
+end
 
 n_id = max(id);
 n = numel(id);
+if nargin < 3
+    k = n;
+end
 
 assert(isscalar(min_dist));
 assert(min_dist >= 1);
@@ -35,7 +40,7 @@ succeeded = false;
 while ~succeeded && i_attempt < n_attempt
     i_attempt = i_attempt + 1;
     succeeded = true;
-    for ii = 1:n
+    for ii = 1:k
         % Choose ids in the preceding min_dist elements.
         id_to_excl = unique(id(max(ii - min_dist + 1, 1):ii - 1))';
         
@@ -60,15 +65,20 @@ if ~succeeded
            '(It may not be impossible though.)\n'], n_attempt, min_dist);
 end
 
-ix = reshape(ix, siz0);
-id = reshape(id, siz0);
+ix = ix(1:k);
+id = id(1:k);
+
+if is_row
+    ix = ix';
+    id = id';
+end
 
 return;
 
 %% Test
 max_dist = 10;
 for dist = 1:max_dist
-    a = [1:max_dist, (max_dist-1):-1:1]; 
+    a = [1:max_dist, (max_dist-1):-1:1]'; 
     fprintf('Dist: %d\n', dist);
     [id, ix, i_attempt] = randperm_w_distance(a, dist)
     assert(all(a(ix) == id), '~all(a(ix) == id)');
