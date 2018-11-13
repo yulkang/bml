@@ -57,6 +57,9 @@ if nargin < 2, % ~exist('defaults', 'var')
 elseif iscell(defaults)
     if isempty(defaults)
         S = struct;
+    elseif isscalar(defaults)
+        assert(isstruct(defaults{1}));
+        S = defaults{1};
     else
         % If names are given in the 1st column and values in the 2nd column,
         if size(defaults,1) > 1
