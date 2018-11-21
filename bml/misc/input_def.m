@@ -93,13 +93,13 @@ if strcmp(S.vertical, 'auto')
     end
 end
 
-if ~iscell(S.choices), S.choices = num2cell(S.choices); end
+% if ~iscell(S.choices), S.choices = num2cell(S.choices); end
         
 switch S.vertical
     case 'always'
-        s_choices = sprintf(['    ' S.fmt, '\n'], S.choices{:});
+        s_choices = sprintf(['    ' S.fmt, '\n'], C_choices{:});
     case 'never'
-        s_choices = sprintf([S.fmt, '|'], S.choices{:});
+        s_choices = sprintf([S.fmt, '|'], C_choices{:});
 end
 
 % Information about default choice
@@ -115,7 +115,7 @@ while true
     switch S.vertical
         case 'always'
             fprintf('%s - options:\n', querry);
-            cfprintf(['%2d ' S.fmt '\n'], 1:length(S.choices), S.choices);
+            cfprintf(['%2d ' S.fmt '\n'], 1:length(C_choices), C_choices);
             fprintf('%s\n', s_default);
             fprintf('%s (press ENTER for default): ', querry);
         case 'never'
@@ -139,9 +139,12 @@ while true
     end
     
     % Check if the response is allowed
-    if isempty(S.choices) || any(ismember(S.choices, res))
+    if isempty(S.choices) ...
+            || (ischar(res) && ismember(res, S.choices)) ...
+            || (isnumeric(res) && ismember(res, S.choices))
+        
         break;
-    elseif ~isnan(str2double(res))
+    elseif ischar(res) && ~isnan(str2double(res))
         ix_res = str2double(res);
         
         if (floor(ix_res) == ix_res) && ...
