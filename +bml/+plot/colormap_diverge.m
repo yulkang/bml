@@ -1,8 +1,9 @@
 function cmap = colormap_diverge(n, colors)
-% cmap = colormap_diverge(n, colors)
+% cmap = colormap_diverge([n, colors])
 %
-% n: positive integer
+% n: positive integer (default: 256)
 % colors: A matrix of 3 rows of [R, G, B] values.
+%         default: blue to white to red
 %
 % cmap: n x 3 matrix.
 
