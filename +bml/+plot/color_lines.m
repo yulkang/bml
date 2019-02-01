@@ -23,7 +23,7 @@ switch desc
     case {'y', 'yellow', 'o', 'orange'}
         color = color0(3, :);
     case {'p', 'purple'}
-        color = color0(4, :);
+        color = color0(4, :) * 0.5 + [0.7, 0.3, 1] * 0.5;
     case {'g', 'green'}
         color = color0(5, :);
     case {'c', 'cyan'}
