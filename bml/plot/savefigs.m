@@ -4,11 +4,17 @@ function files = savefigs(file, varargin)
 % files = savefigs(file, varargin)
 %
 % OPTIONS
-% 'ext', {'.fig', '.png'}
+% 'ext', {'.png', '.fig'}
 % 'subdir_w_ext', false % e.g., png/*.png
 % 'size', [400 300] % Set empty to keep original.
 % 'h_fig', [] % Use gcf if empty
 % 'verbose', 1
+% 'resolution', 300
+% 'PaperUnits', 'centimeters'
+% 'PaperPosition', [] % If given, uses PaperPositionMode = 'manual'
+% 'PaperMargin', [0 0 0 0] % [left bottom right top]
+% 'to_resize', true
+% 'to_save', true
 
 S = varargin2S(varargin, {
     'ext', {'.png', '.fig'}
