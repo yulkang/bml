@@ -17,7 +17,7 @@ function files = savefigs(file, varargin)
 % 'to_save', true
 
 S = varargin2S(varargin, {
-    'ext', {'.png', '.fig'}
+    'ext', {'.png', '.fig', '.eps'}
     'subdir_w_ext', false % e.g., png/*.png
     'size', [400 300] % Set empty to keep original.
     'h_fig', [] % Use gcf if empty
@@ -79,6 +79,8 @@ if S.to_save
                 print(S.h_fig, files{i_ext}, '-dtiff', C_opt{:});
             case '.eps'
                 print(S.h_fig, files{i_ext}, '-depsc2', C_opt{:});
+            case '.svg'
+                print(S.h_fig, files{i_ext}, '-dsvg', C_opt{:});
             case '.pdf'
                 print(S.h_fig, files{i_ext}, '-dpdf', C_opt{:});
             otherwise
