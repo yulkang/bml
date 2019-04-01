@@ -18,5 +18,9 @@ function v = cell2vec(c)
 %
 % 2013 (c) Yul Kang. hk2699 at columbia dot edu.
 
-c = cellfun(@(m) m(:), c, 'UniformOutput', false);
-v = cell2mat(c(:))';
+if iscell(c)
+    c = cellfun(@(m) m(:), c, 'UniformOutput', false);
+    v = cell2mat(c(:))';
+else
+    v = c(:)';
+end
