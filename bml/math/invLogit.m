@@ -2,7 +2,7 @@ function p = invLogit(x)
 % p = invLogit(x)
 %   = exp(x)./(1+exp(x));
 
-p = exp(x)./(1+exp(x));
+p = 1 ./ (1 + exp(-x));
 p_nan = isnan(p);
 if any(p_nan)
     x_pos = x > 0;
