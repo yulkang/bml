@@ -17,6 +17,7 @@ function h = figure2struct(src)
 % - line
 % - text
 % - legend
+% - patch
 % - marker (line with LineStyle = 'none'),
 % - segment (line with only two coordinates), 
 % - segment_vert
@@ -81,7 +82,7 @@ else
             'Give a figure, axes, or handle graphics objects!');
     end
 end
-for kind = {'line', 'text', 'legend'}
+for kind = {'line', 'text', 'legend', 'patch'}
     if ismember(kind{1}, {'legend'})
         if ~isempty(src)
             parent = get(src(1), 'Parent');
