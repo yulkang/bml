@@ -40,7 +40,9 @@ function v = row2cell2(v, n_in_row)
 %
 % See also: cell2mat2   
 
-if ~iscell(v)
+if iscell(v)
+    return;
+else
     assert(ismatrix(v) && isnumeric(v));
     v = row2cell(v);
 end
