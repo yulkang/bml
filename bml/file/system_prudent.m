@@ -35,7 +35,7 @@ if ~S.cmd_only
         yn = inputYN_def('Execute the commands using system ', true);
         if ~yn
             fprintf('Copy by clicking:\n');
-            fprintf('0. '); disp2copy(['cd ' pwd]);
+            fprintf('0. '); disp2copy(['cd "' pwd '"']);
             for ii = 1:n
                 fprintf('%d. ', ii); 
                 disp2copy(strrep(cmd{ii}, '''', ''''''));
