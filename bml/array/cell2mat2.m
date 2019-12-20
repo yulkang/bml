@@ -1,7 +1,12 @@
-function m = cell2mat2(c, pad_with, enforce_double)
+function m = cell2mat2(c, varargin)
 % CELL2MAT2  cell2mat with padding. Return original if non-cell. Enforces each element to be a horizontal vector.
 %
-% m = cell2mat2(c, [pad_with=NaN])
+% m = cell2mat2(c, ...)
+%
+% OPTIONS:
+% 'pad_with', nan
+% 'enforce_double', true
+% 'max_len', nan
 %
 % EXAMPLE:
 % >> cell2mat2({[1 2 3], [ 1 3], 1, [], [ 1 2 3 4]})
@@ -13,12 +18,23 @@ function m = cell2mat2(c, pad_with, enforce_double)
 %      1     2     3     4
 
 if ~iscell(c), m = c; return; end
-if nargin < 2, pad_with = nan; end
-if nargin < 3, enforce_double = true; end
+
+S = varargin2S(varargin, {
+    'pad_with', nan
+    'enforce_double', true
+    'max_len', nan
+    });
 
 n = length(c);
 l = cellfun(@length, c);
-max_l = max(l);
+
+pad_with = S.pad_with;
+enforce_double = S.enforce_double;
+if isnan(S.max_len)
+    max_len = max(l);
+else
+    max_len = S.max_len;
+end
 
 is_nested_cell = cellfun(@iscell, c);
 while any(is_nested_cell)
@@ -28,10 +44,16 @@ while any(is_nested_cell)
 end
 
 if enforce_double
-    c2 = cellfun(@(cc) [double(cc(:)'), zeros(1, max_l - length(cc)) + pad_with], c, ...
+    c2 = cellfun( ...
+        @(cc) [double(hVec(cc(1:min(end, max_len)))), ...
+               zeros(1, max(0, max_len - length(cc))) + pad_with], ...
+        c, ...
         'UniformOutput', false);
 else
-    c2 = cellfun(@(cc) [cc(:)', zeros(1, max_l - length(cc)) + pad_with], c, ...
+    c2 = cellfun( ...
+        @(cc) [hVec(cc(1:min(end, max_len))), ...
+               zeros(1, max_len - length(cc)) + pad_with], ...
+        c, ...
         'UniformOutput', false);
 end
 m  = cell2mat(c2(:));
