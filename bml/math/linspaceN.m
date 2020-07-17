@@ -17,7 +17,7 @@ function y = linspaceN(d1, d2, n, dimRep)
 %   Copyright 1984-2011 The MathWorks, Inc.
 %   $Revision: 5.12.4.6 $  $Date: 2011/05/17 02:22:58 $
 %
-%	modified by Yul Kang 2011.
+%	modified by Yul Kang 2011. hk2699 at caa dot columbia dot edu.
 
 nDim = length(size(d1));
 
